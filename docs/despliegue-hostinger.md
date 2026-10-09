@@ -30,7 +30,8 @@ El repositorio ya incluye `vendor/` (sin paquetes de desarrollo), `public/build`
 
 1. hPanel → *Git*: repositorio `https://github.com/jamielsp2/rent-car-system.git`, rama `main`, directorio vacío (`public_html`).
 2. Abre el dominio: en el primer acceso se crea `.env` solo (con su propia `APP_KEY`, producción) y se abre `/instalar`.
-3. Si `storage/` o `bootstrap/cache/` no son escribibles, ponles permisos 775.
+3. Hay un `index.php` en la raíz que arranca la app y sirve `public/` aunque el hosting ignore `.htaccess` (en esos planes todo URL desconocido cae en `/index.php`). Si puedes cambiar la *raíz del sitio* a `public/` en hPanel, mejor.
+4. Si `storage/` o `bootstrap/cache/` no son escribibles, ponles permisos 775.
 
 Para publicar cambios: antes de `git push` ejecuta `composer install --no-dev --optimize-autoloader`, `npm run build` y `php artisan livewire:publish --assets`, y vuelve a `composer install` para seguir desarrollando.
 
