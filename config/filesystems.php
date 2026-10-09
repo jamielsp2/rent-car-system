@@ -9,6 +9,8 @@ if (! preg_match('#^([A-Za-z]:)?[\\\\/]#', $mediaRoot)) {
     $mediaRoot = base_path($mediaRoot);
 }
 
+$r2 = \App\Support\R2::settings();
+
 return [
 
     /*
@@ -39,8 +41,18 @@ return [
 
     'disks' => [
 
-        // Uploads: vehicle photos, contract and return photos, logos...
-        'media' => [
+        // Uploads: vehicle photos, contract and return photos, logos... In the client's own
+        // Cloudflare R2 bucket when it has one (see App\Support\R2), otherwise on this server.
+        'media' => $r2 ? [
+            'driver' => 'r2',
+            'endpoint' => $r2['endpoint'],
+            'bucket' => $r2['bucket'],
+            'key' => $r2['key'],
+            'secret' => $r2['secret'],
+            'region' => 'auto',
+            'throw' => false,
+            'report' => false,
+        ] : [
             'driver' => 'local',
             'root' => $mediaRoot,
             // Same origin as the admin, so photos preview without cross-origin problems.
@@ -95,8 +107,8 @@ return [
 
     'links' => [
         public_path('storage') => storage_path('app/public'),
-        // Not needed when the photos already live in public/media.
-        ...(realpath($mediaRoot) !== realpath(public_path('media')) ? [public_path('media') => $mediaRoot] : []),
+        // Not needed when the photos already live in public/media (or in R2).
+        ...(! $r2 && realpath($mediaRoot) !== realpath(public_path('media')) ? [public_path('media') => $mediaRoot] : []),
     ],
 
 ];

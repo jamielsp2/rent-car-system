@@ -154,8 +154,52 @@ class License
 
         self::storeCode(preg_replace('/\s+/', '', $code));
         self::saveState(['checked_at' => 0, 'revoked' => false]);
+        self::syncStorage();
 
         return $payload;
+    }
+
+    /**
+     * Pide a la plataforma las credenciales del bucket R2 de este cliente (si tiene uno)
+     * y las guarda. Sin internet o sin bucket no cambia nada.
+     */
+    public static function syncStorage(): bool
+    {
+        $code = self::storedCode();
+        $payload = $code ? self::parse($code) : null;
+        $parts = $payload && $payload['url'] ? parse_url($payload['url']) : false;
+
+        if ($payload === null || ! $parts || ! in_array($parts['scheme'] ?? '', ['http', 'https'], true) || empty($parts['host'])) {
+            return false;
+        }
+
+        parse_str($parts['query'] ?? '', $query);
+        $query['r'] = 'storage';
+        $endpoint = $parts['scheme'] . '://' . $parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : '') . ($parts['path'] ?? '/') . '?' . http_build_query($query);
+
+        try {
+            $data = Http::timeout(6)->connectTimeout(3)->acceptJson()->asForm()->post($endpoint, ['token' => $code])->json();
+        } catch (Throwable) {
+            return false;
+        }
+
+        if (! is_array($data) || ($data['status'] ?? null) !== 'ok') {
+            return false;
+        }
+
+        foreach (['endpoint', 'bucket', 'key', 'secret'] as $field) {
+            if (empty($data[$field]) || ! is_string($data[$field])) {
+                return false;
+            }
+        }
+
+        if (! preg_match('#^https://[a-z0-9]+(\.eu|\.fedramp)?\.r2\.cloudflarestorage\.com$#', $data['endpoint'])) {
+            return false;
+        }
+
+        R2::save(['endpoint' => $data['endpoint'], 'bucket' => $data['bucket'], 'key' => $data['key'], 'secret' => $data['secret']]);
+
+        return true;
     }
 
     /**
@@ -208,6 +252,9 @@ class License
             if ($renewed !== null && $renewed['id'] === $payload['id'] && $renewed['exp'] > $payload['exp']) {
                 self::storeCode(preg_replace('/\s+/', '', $data['token']));
             }
+
+            // Keeps the bucket's credential current (it changes when the provider rotates it).
+            self::syncStorage();
         }
 
         return true;

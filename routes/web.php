@@ -4,6 +4,7 @@ use App\Http\Controllers\BookingCalendarController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\InstallController;
 use App\Http\Controllers\LicenseController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SiteController;
@@ -19,6 +20,14 @@ Route::controller(LicenseController::class)->group(function (): void {
     Route::post('/licencia', 'store')->middleware('throttle:10,1')->name('license.store');
     Route::post('/licencia/comprobar', 'check')->middleware('throttle:10,1')->name('license.check');
 });
+
+// Files in the client's R2 bucket. No session or cookies: every photo of the site goes through here.
+Route::get('/media-r2', [MediaController::class, 'show'])->name('media.r2')->withoutMiddleware([
+    \Illuminate\Session\Middleware\StartSession::class,
+    \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+    \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
+]);
 
 Route::get('/', [SiteController::class, 'home'])->name('site.home');
 Route::get('/cars', [SiteController::class, 'cars'])->name('site.cars');
