@@ -46,6 +46,7 @@ php artisan serve
 |---|---|
 | [docs/instalacion.md](docs/instalacion.md) | Instalación local, asistente web, comando y variables de entorno |
 | [docs/despliegue-hostinger.md](docs/despliegue-hostinger.md) | Subir un cliente nuevo a Hostinger / hosting compartido y problemas conocidos |
+| [docs/licencias.md](docs/licencias.md) | Licencias mensuales/anuales: crear, activar, renovar y suspender desde la plataforma de licencias |
 | [docs/personalizacion.md](docs/personalizacion.md) | Marca, colores, textos, pagos, contrato, monedas e impuestos de cada cliente |
 | [docs/operacion.md](docs/operacion.md) | Uso diario: reservas, entregas, contratos e informes |
 | [docs/arquitectura.md](docs/arquitectura.md) | Estructura del código, base de datos y servicios |

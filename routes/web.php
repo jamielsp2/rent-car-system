@@ -3,6 +3,7 @@
 use App\Http\Controllers\BookingCalendarController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\InstallController;
+use App\Http\Controllers\LicenseController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SiteController;
@@ -11,6 +12,12 @@ use Illuminate\Support\Facades\Route;
 Route::controller(InstallController::class)->group(function (): void {
     Route::get('/instalar', 'show')->name('install.show');
     Route::post('/instalar', 'store')->middleware('throttle:10,1')->name('install.store');
+});
+
+Route::controller(LicenseController::class)->group(function (): void {
+    Route::get('/licencia', 'show')->name('license.show');
+    Route::post('/licencia', 'store')->middleware('throttle:10,1')->name('license.store');
+    Route::post('/licencia/comprobar', 'check')->middleware('throttle:10,1')->name('license.check');
 });
 
 Route::get('/', [SiteController::class, 'home'])->name('site.home');

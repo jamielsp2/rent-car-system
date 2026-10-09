@@ -1,0 +1,271 @@
+<?php
+
+namespace App\Support;
+
+use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\ValidationException;
+use Throwable;
+
+/**
+ * Licencia del sistema: un código firmado por la plataforma de licencias
+ * (RCS1.<datos>.<firma>) que se pega en /licencia. Se comprueba sin internet con la
+ * clave pública; además, cada pocas horas consulta a la plataforma para enterarse de
+ * renovaciones (la fecha se actualiza sola) o revocaciones.
+ */
+class License
+{
+    public const ACTIVE = 'active';
+
+    public const GRACE = 'grace';
+
+    public const EXPIRED = 'expired';
+
+    public const REVOKED = 'revoked';
+
+    public const WRONG_DOMAIN = 'wrong_domain';
+
+    public const INVALID = 'invalid';
+
+    public const MISSING = 'missing';
+
+    /**
+     * Datos de un código si la firma es válida; null si está alterado o no es un código.
+     *
+     * @return array{id: string, client: string, plan: string, iat: int, exp: int, domain: ?string, url: ?string}|null
+     */
+    public static function parse(string $code, ?string $publicKey = null): ?array
+    {
+        $parts = explode('.', preg_replace('/\s+/', '', $code));
+
+        if (count($parts) !== 3 || $parts[0] !== 'RCS1') {
+            return null;
+        }
+
+        $payload = self::decode($parts[1]);
+        $signature = self::decode($parts[2]);
+        $key = base64_decode((string) ($publicKey ?? config('license.public_key')), true);
+
+        if ($payload === null || $signature === null || $key === false || strlen($key) !== SODIUM_CRYPTO_SIGN_PUBLICKEYBYTES
+            || strlen($signature) !== SODIUM_CRYPTO_SIGN_BYTES || ! sodium_crypto_sign_verify_detached($signature, $payload, $key)) {
+            return null;
+        }
+
+        $data = json_decode($payload, true);
+
+        if (! is_array($data) || ($data['v'] ?? null) !== 1 || ! isset($data['id'], $data['exp']) || ! is_int($data['exp'])) {
+            return null;
+        }
+
+        return [
+            'id' => (string) $data['id'],
+            'client' => (string) ($data['client'] ?? ''),
+            'plan' => (string) ($data['plan'] ?? ''),
+            'iat' => (int) ($data['iat'] ?? 0),
+            'exp' => $data['exp'],
+            'domain' => ! empty($data['domain']) ? strtolower((string) $data['domain']) : null,
+            'url' => ! empty($data['url']) ? (string) $data['url'] : null,
+        ];
+    }
+
+    /**
+     * Estado de una licencia ya verificada.
+     *
+     * @return array{state: string, days_left: int, expires_at: int, grace_ends_at: int}
+     */
+    public static function evaluate(array $payload, bool $revoked, ?string $host, ?int $now = null, ?int $graceDays = null): array
+    {
+        $now ??= time();
+        $graceDays ??= (int) config('license.grace_days', 3);
+        $graceEnds = $payload['exp'] + $graceDays * 86400;
+
+        $state = match (true) {
+            $revoked => self::REVOKED,
+            $payload['domain'] !== null && $host !== null && ! self::hostMatches($host, $payload['domain']) => self::WRONG_DOMAIN,
+            $now <= $payload['exp'] => self::ACTIVE,
+            $now <= $graceEnds => self::GRACE,
+            default => self::EXPIRED,
+        };
+
+        return [
+            'state' => $state,
+            'days_left' => (int) floor(($payload['exp'] - $now) / 86400),
+            'expires_at' => $payload['exp'],
+            'grace_ends_at' => $graceEnds,
+        ];
+    }
+
+    public static function hostMatches(string $host, string $domain): bool
+    {
+        $host = strtolower($host);
+
+        return $host === $domain || str_ends_with($host, '.' . $domain);
+    }
+
+    /**
+     * Estado actual del sistema (lee el código guardado y lo verifica).
+     *
+     * @return array{state: string, license: ?array, days_left: int, expires_at: int, grace_ends_at: int}
+     */
+    public static function current(): array
+    {
+        $none = ['license' => null, 'days_left' => 0, 'expires_at' => 0, 'grace_ends_at' => 0];
+        $code = self::storedCode();
+
+        if ($code === null) {
+            return ['state' => self::MISSING] + $none;
+        }
+
+        $payload = self::parse($code);
+
+        if ($payload === null) {
+            return ['state' => self::INVALID] + $none;
+        }
+
+        $host = app()->runningInConsole() ? null : request()->getHost();
+
+        return self::evaluate($payload, self::state()['revoked'] ?? false, $host) + ['license' => $payload];
+    }
+
+    public static function allows(): bool
+    {
+        return in_array(self::current()['state'], [self::ACTIVE, self::GRACE], true);
+    }
+
+    /**
+     * Guarda un código nuevo (lo que se pega en /licencia).
+     *
+     * @throws ValidationException
+     */
+    public static function activate(string $code): array
+    {
+        $payload = self::parse($code);
+
+        if ($payload === null) {
+            throw ValidationException::withMessages(['code' => 'El código no es válido. Cópialo completo, tal como lo entrega la plataforma de licencias.']);
+        }
+
+        if ($payload['exp'] + (int) config('license.grace_days', 3) * 86400 < time()) {
+            throw ValidationException::withMessages(['code' => 'Esa licencia ya venció el ' . date('d/m/Y', $payload['exp']) . '. Pide un código renovado.']);
+        }
+
+        if ($payload['domain'] !== null && ! app()->runningInConsole() && ! self::hostMatches(request()->getHost(), $payload['domain'])) {
+            throw ValidationException::withMessages(['code' => 'Esa licencia es para el dominio ' . $payload['domain'] . ', no para este sitio.']);
+        }
+
+        self::storeCode(preg_replace('/\s+/', '', $code));
+        self::saveState(['checked_at' => 0, 'revoked' => false]);
+
+        return $payload;
+    }
+
+    /**
+     * Pregunta a la plataforma si hay renovación o revocación. Sin internet o con
+     * error, no cambia nada (la licencia sigue valiendo hasta su fecha).
+     *
+     * @return bool true si se pudo consultar
+     */
+    public static function checkOnline(): bool
+    {
+        $payload = ($code = self::storedCode()) ? self::parse($code) : null;
+        $url = $payload['url'] ?? null;
+
+        if ($payload === null || ! $url || ! preg_match('#^https?://#i', $url)) {
+            return false;
+        }
+
+        $state = self::state();
+        $state['checked_at'] = time();
+        self::saveState($state);
+
+        try {
+            // Built by hand: passing the query as an argument would replace the one already in the URL.
+            $response = Http::timeout(4)->connectTimeout(3)->acceptJson()
+                ->get($url . (str_contains($url, '?') ? '&' : '?') . http_build_query(['id' => $payload['id']]));
+        } catch (Throwable) {
+            return false;
+        }
+
+        $data = $response->json();
+
+        if (! is_array($data) || ! isset($data['status'])) {
+            return false;
+        }
+
+        if ($data['status'] === 'revoked') {
+            $state['revoked'] = true;
+            self::saveState($state);
+
+            return true;
+        }
+
+        if (in_array($data['status'], ['active', 'expired'], true)) {
+            $state['revoked'] = false;
+            self::saveState($state);
+
+            // A renewal: the same license with a later date, signed by the platform.
+            $renewed = is_string($data['token'] ?? null) ? self::parse($data['token']) : null;
+
+            if ($renewed !== null && $renewed['id'] === $payload['id'] && $renewed['exp'] > $payload['exp']) {
+                self::storeCode(preg_replace('/\s+/', '', $data['token']));
+            }
+        }
+
+        return true;
+    }
+
+    /** Consulta a la plataforma si toca (cada `check_hours`, o cada 10 min si la licencia no está vigente). */
+    public static function checkOnlineIfDue(): void
+    {
+        $state = self::state();
+        $valid = self::allows();
+        $interval = $valid ? (int) config('license.check_hours', 12) * 3600 : 600;
+
+        if (self::storedCode() !== null && time() - (int) ($state['checked_at'] ?? 0) >= $interval) {
+            self::checkOnline();
+        }
+    }
+
+    // ---- almacenamiento: archivos en storage/app (no dependen de la base de datos) ----
+
+    protected static function codePath(): string
+    {
+        return storage_path('app/license.key');
+    }
+
+    protected static function statePath(): string
+    {
+        return storage_path('app/license-state.json');
+    }
+
+    protected static function storedCode(): ?string
+    {
+        $code = is_file(self::codePath()) ? trim((string) file_get_contents(self::codePath())) : '';
+
+        return $code !== '' ? $code : null;
+    }
+
+    protected static function storeCode(string $code): void
+    {
+        file_put_contents(self::codePath(), $code, LOCK_EX);
+    }
+
+    /** @return array{checked_at?: int, revoked?: bool} */
+    protected static function state(): array
+    {
+        $data = is_file(self::statePath()) ? json_decode((string) file_get_contents(self::statePath()), true) : null;
+
+        return is_array($data) ? $data : [];
+    }
+
+    protected static function saveState(array $state): void
+    {
+        file_put_contents(self::statePath(), json_encode($state), LOCK_EX);
+    }
+
+    protected static function decode(string $text): ?string
+    {
+        $raw = base64_decode(strtr($text, '-_', '+/'), true);
+
+        return $raw === false ? null : $raw;
+    }
+}

@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
-        $middleware->web(prepend: [\App\Http\Middleware\EnsureInstalled::class]);
+        $middleware->web(prepend: [\App\Http\Middleware\EnsureInstalled::class, \App\Http\Middleware\EnsureLicensed::class]);
         // Shared hosting answers HTTPS at a proxy in front of PHP; trust its headers
         // so URLs, cookies and the login form use https.
         $middleware->trustProxies(at: '*');
