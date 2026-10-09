@@ -1,0 +1,16 @@
+# Hosting compartido (Hostinger, cPanel): la raíz del dominio es esta carpeta,
+# así que todo se redirige a public/ y el código y el .env quedan privados.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Validación SSL del hosting.
+    RewriteRule ^\.well-known/ - [L]
+
+    # Nunca servir archivos privados.
+    RewriteRule ^\.(env|git) - [F,L]
+    RewriteRule ^(app|bootstrap|config|database|deploy|docs|resources|routes|storage|tests|vendor)/ - [F,L]
+
+    # El sitio vive en public/.
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

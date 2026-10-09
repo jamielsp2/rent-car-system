@@ -24,6 +24,16 @@ Resultado: `build/rent-car-system.zip`, con un `.env` nuevo (APP_KEY propia, `AP
 5. Entra a `/admin` y personaliza todo ([personalizacion.md](personalizacion.md)).
 6. Activa SSL en hPanel y pon `APP_URL=https://tu-dominio` (el asistente ya lo guarda; el sistema fuerza https y confía en el proxy).
 
+## Alternativa: desplegar con Git (sin zip)
+
+El repositorio ya incluye `vendor/` (sin paquetes de desarrollo), `public/build`, los assets de Livewire y un `.htaccess` en la raíz, así que se puede clonar tal cual:
+
+1. hPanel → *Git*: repositorio `https://github.com/jamielsp2/rent-car-system.git`, rama `main`, directorio vacío (`public_html`).
+2. Abre el dominio: en el primer acceso se crea `.env` solo (con su propia `APP_KEY`, producción) y se abre `/instalar`.
+3. Si `storage/` o `bootstrap/cache/` no son escribibles, ponles permisos 775.
+
+Para publicar cambios: antes de `git push` ejecuta `composer install --no-dev --optimize-autoloader`, `npm run build` y `php artisan livewire:publish --assets`, y vuelve a `composer install` para seguir desarrollando.
+
 ## 3. Fotos
 
 Las fotos subidas desde el admin se guardan en `public/media` (variable `MEDIA_ROOT`). No hay que subir nada: se llenan al usar el panel. Para migrar fotos de otro sitio, extrae un zip con la carpeta `public/media/...` sobre la raíz.
