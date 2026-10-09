@@ -27,6 +27,15 @@ if ($path !== '/' && $file !== false && is_file($file) && str_starts_with($file,
     exit;
 }
 
+// This host only serves existing files by URL (a missing /build/x.css never reaches PHP),
+// so assets and uploads are linked through /public/... where they physically are.
+foreach (['ASSET_URL' => '/public', 'MEDIA_URL' => '/public/media'] as $key => $value) {
+    if (getenv($key) === false && ! isset($_SERVER[$key])) {
+        putenv("$key=$value");
+        $_SERVER[$key] = $_ENV[$key] = $value;
+    }
+}
+
 $_SERVER['SCRIPT_FILENAME'] = $public.DIRECTORY_SEPARATOR.'index.php';
 $_SERVER['SCRIPT_NAME'] = '/index.php';
 $_SERVER['PHP_SELF'] = '/index.php';
