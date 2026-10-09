@@ -93,11 +93,6 @@
                     </div>
                 </fieldset>
 
-                <label class="flex cursor-pointer gap-3 rounded-xl bg-neutral-100 p-4 text-sm text-neutral-700">
-                    <input type="checkbox" name="demo" value="1" @checked(old('demo')) class="mt-0.5 size-5 shrink-0 accent-brand">
-                    <span><strong>Cargar datos de ejemplo</strong> (vehículos, reservas y artículos de prueba). Útil para conocer el sistema; no lo marques en un negocio real.</span>
-                </label>
-
                 <button class="w-full rounded-xl bg-brand py-4 text-base font-bold text-white transition hover:bg-brand-dark" onclick="this.disabled = true; this.textContent = 'Instalando… puede tardar un minuto'; this.form.submit()">
                     Instalar
                 </button>

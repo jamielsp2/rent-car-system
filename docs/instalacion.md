@@ -28,7 +28,7 @@ La base de datos debe existir y estar configurada en `.env`. El comando es idemp
 
 - 27 tablas (`database/schema/rent_car.sql`, ejecutado por la migración `create_rent_car_schema`).
 - Datos base (`DefaultDataSeeder`): monedas USD (base), DOP y EUR; impuesto ITBIS; marcas, tipos, transmisiones, combustibles y colores; preguntas frecuentes; ajustes por defecto.
-- `--demo` añade (`DemoSeeder`): 10 vehículos, 3 clientes, servicios adicionales, reservas en todos los estados, gastos, artículos de blog y testimonios. **Nunca lo uses en la base de un cliente real.**
+- `--demo` añade (`DemoSeeder`): 10 vehículos, 3 clientes, servicios adicionales, reservas en todos los estados, gastos, artículos de blog y testimonios. **Solo existe en la terminal: el instalador web siempre deja el sistema vacío** (sin vehículos, clientes, reservas ni artículos); el cliente carga lo suyo. Nunca lo uses en la base de un cliente real.
 
 ## Variables de entorno relevantes
 

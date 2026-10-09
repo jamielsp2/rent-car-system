@@ -40,7 +40,6 @@ class InstallController extends Controller
             'admin_name' => ['required', 'string', 'max:120'],
             'admin_email' => ['required', 'email', 'max:191'],
             'admin_password' => ['required', 'string', 'min:8', 'confirmed'],
-            'demo' => ['nullable', 'boolean'],
         ], [], [
             'site_name' => 'nombre del negocio', 'app_url' => 'dirección del sitio', 'host' => 'servidor', 'port' => 'puerto',
             'database' => 'nombre de la base de datos', 'username' => 'usuario', 'password' => 'contraseña',
@@ -63,7 +62,7 @@ class InstallController extends Controller
                 'name' => $data['admin_name'],
                 'email' => $data['admin_email'],
                 'password' => $data['admin_password'],
-            ], (bool) ($data['demo'] ?? false));
+            ]);
 
             // Last, so a failed attempt can be retried from the wizard.
             EnvFile::set(['APP_INSTALLED' => 'true']);
