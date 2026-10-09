@@ -1,0 +1,122 @@
+<?php
+
+namespace App\Filament\Resources\Cars\Schemas;
+
+use App\Enums\CarStatus;
+use App\Models\Car;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
+
+class CarForm
+{
+    public static function configure(Schema $schema): Schema
+    {
+        return $schema
+            ->columns(3)
+            ->components([
+                Group::make([
+                    Section::make('Vehículo')
+                        ->columns(['default' => 1, 'sm' => 2, 'xl' => 3])
+                        ->schema([
+                            TextInput::make('name')
+                                ->label('Nombre')
+                                ->placeholder('Toyota RAV4 2023')
+                                ->required()
+                                ->maxLength(191)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(function (?string $state, ?string $old, Set $set, callable $get): void {
+                                    // Suggest the address from the name until it's edited by hand.
+                                    if (blank($get('slug_key')) || $get('slug_key') === Str::slug((string) $old)) {
+                                        $set('slug_key', Str::slug((string) $state));
+                                    }
+                                })
+                                ->columnSpanFull(),
+                            TextInput::make('slug_key')
+                                ->label('Dirección en la web')
+                                ->prefix(url('/cars') . '/')
+                                ->helperText('Se completa sola a partir del nombre.')
+                                ->maxLength(191)
+                                ->dehydrated(false)
+                                ->afterStateHydrated(fn (TextInput $component, ?Car $record) => $component->state($record?->slug?->key))
+                                ->columnSpanFull(),
+                            Select::make('make_id')->label('Marca')->relationship('make', 'name')->searchable()->preload(),
+                            TextInput::make('model_name')->label('Modelo')->maxLength(120),
+                            TextInput::make('year')->label('Año')->numeric()->minValue(1950)->maxValue(now()->year + 1),
+                            Select::make('vehicle_type_id')->label('Tipo')->relationship('type', 'name')->preload(),
+                            Select::make('transmission_id')->label('Transmisión')->relationship('transmission', 'name')->preload(),
+                            Select::make('fuel_type_id')->label('Combustible')->relationship('fuel', 'name')->preload(),
+                            TextInput::make('number_of_seats')->label('Asientos')->numeric()->minValue(1),
+                            TextInput::make('number_of_doors')->label('Puertas')->numeric()->minValue(1),
+                            TextInput::make('mileage')->label('Kilometraje')->numeric()->minValue(0)->suffix('km'),
+                            TextInput::make('license_plate')->label('Placa')->maxLength(15),
+                            TextInput::make('vin')->label('Chasis (VIN)')->maxLength(191)->columnSpan(['sm' => 2, 'xl' => 2]),
+                        ]),
+
+                    Section::make('Fotos')
+                        ->description('La primera foto es la portada en la web. Arrástralas para cambiar el orden.')
+                        ->schema([
+                            FileUpload::make('images')
+                                ->hiddenLabel()
+                                ->disk('media')
+                                ->directory('cars')
+                                ->visibility('public')
+                                ->image()
+                                ->imageEditor()
+                                ->multiple()
+                                ->reorderable()
+                                ->appendFiles()
+                                ->panelLayout('grid')
+                                ->imagePreviewHeight('170')
+                                ->maxSize(8192),
+                        ]),
+
+                    Section::make('Descripción en la web')
+                        ->collapsible()
+                        ->schema([
+                            Textarea::make('description')
+                                ->label('Resumen')
+                                ->helperText('Aparece debajo del nombre y en Google.')
+                                ->rows(2)
+                                ->maxLength(400),
+                            RichEditor::make('content')
+                                ->label('Descripción completa')
+                                ->toolbarButtons([
+                                    ['bold', 'italic', 'underline'],
+                                    ['h2', 'h3'],
+                                    ['bulletList', 'orderedList'],
+                                    ['undo', 'redo'],
+                                ]),
+                        ]),
+                ])->columnSpan(['default' => 3, 'lg' => 2]),
+
+                Group::make([
+                    Section::make('Renta')
+                        ->schema([
+                            Select::make('status')
+                                ->label('Estado')
+                                ->options(CarStatus::class)
+                                ->default(CarStatus::Available)
+                                ->selectablePlaceholder(false)
+                                ->required(),
+                            TextInput::make('rental_rate')->label('Tarifa por día')->numeric()->minValue(0)->prefix('$')->required(),
+                            TextInput::make('deposit_amount')->label('Depósito de garantía')->numeric()->minValue(0)->prefix('$'),
+                            TextInput::make('min_rental_days')->label('Renta mínima')->numeric()->minValue(1)->default(1)->suffix('días')->required(),
+                            Toggle::make('is_featured')->label('Destacado en la web'),
+                        ]),
+                    Section::make('Seguro')
+                        ->schema([
+                            Textarea::make('insurance_info')->hiddenLabel()->placeholder('Aseguradora, póliza, vencimiento...')->rows(3),
+                        ]),
+                ])->columnSpan(['default' => 3, 'lg' => 1]),
+            ]);
+    }
+}

@@ -1,0 +1,112 @@
+<x-filament-widgets::widget>
+    <div class="space-y-4">
+        <p class="text-sm text-gray-500">
+            <span class="font-semibold text-gray-900">{{ $range }}</span>
+            · comparado con {{ $previous }}
+        </p>
+
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {{-- Featured: revenue --}}
+            @php($card = $hero['revenue'])
+            <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-900 via-slate-800 to-[#206bc4] p-5 text-white shadow-lg shadow-slate-900/10">
+                <div class="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-white/10 blur-2xl"></div>
+                <div class="relative flex items-start justify-between gap-3">
+                    <div class="flex size-10 items-center justify-center rounded-lg bg-white/15">
+                        <x-filament::icon icon="heroicon-o-currency-dollar" class="size-5 text-white" />
+                    </div>
+                    @include('filament.reports.partials.delta', ['delta' => $card['delta'], 'dark' => true])
+                </div>
+                <p class="relative mt-4 text-xs font-medium uppercase tracking-wider text-white/70">{{ $card['label'] }}</p>
+                <p class="relative mt-1 text-3xl font-bold tracking-tight tabular-nums">{{ $card['value'] }}</p>
+                <p class="relative mt-1 text-xs text-white/70">{{ $card['hint'] }}</p>
+                @if ($card['spark'])
+                    <svg viewBox="0 0 100 32" preserveAspectRatio="none" class="relative mt-3 h-10 w-full" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="spark-revenue" x1="0" x2="0" y1="0" y2="1">
+                                <stop offset="0%" stop-color="#fff" stop-opacity="0.35" />
+                                <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+                            </linearGradient>
+                        </defs>
+                        <path d="{{ $card['spark']['area'] }}" fill="url(#spark-revenue)" />
+                        <path d="{{ $card['spark']['line'] }}" fill="none" stroke="#fff" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="round" />
+                    </svg>
+                @endif
+            </div>
+
+            {{-- Profit and bookings --}}
+            @foreach (['profit' => ['heroicon-o-chart-bar-square', 'emerald', '#10b981'], 'bookings' => ['heroicon-o-calendar-days', 'sky', '#0ea5e9']] as $key => [$icon, $tone, $stroke])
+                @php($card = $hero[$key])
+                <div class="relative overflow-hidden rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+                    <div class="flex items-start justify-between gap-3">
+                        <div @class([
+                            'flex size-10 items-center justify-center rounded-lg',
+                            'bg-emerald-50 text-emerald-600' => $tone === 'emerald',
+                            'bg-sky-50 text-sky-600' => $tone === 'sky',
+                        ])>
+                            <x-filament::icon :icon="$icon" class="size-5" />
+                        </div>
+                        @include('filament.reports.partials.delta', ['delta' => $card['delta']])
+                    </div>
+                    <p class="mt-4 text-xs font-medium uppercase tracking-wider text-gray-500">{{ $card['label'] }}</p>
+                    <p @class(['mt-1 text-3xl font-bold tracking-tight tabular-nums', 'text-rose-600' => $card['negative'] ?? false, 'text-gray-950' => ! ($card['negative'] ?? false)])>{{ $card['value'] }}</p>
+                    <p class="mt-1 text-xs text-gray-500">{{ $card['hint'] }}</p>
+                    @if ($card['spark'])
+                        <svg viewBox="0 0 100 32" preserveAspectRatio="none" class="mt-3 h-10 w-full" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="spark-{{ $key }}" x1="0" x2="0" y1="0" y2="1">
+                                    <stop offset="0%" stop-color="{{ $stroke }}" stop-opacity="0.25" />
+                                    <stop offset="100%" stop-color="{{ $stroke }}" stop-opacity="0" />
+                                </linearGradient>
+                            </defs>
+                            <path d="{{ $card['spark']['area'] }}" fill="url(#spark-{{ $key }})" />
+                            <path d="{{ $card['spark']['line'] }}" fill="none" stroke="{{ $stroke }}" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="round" />
+                        </svg>
+                    @endif
+                </div>
+            @endforeach
+
+            {{-- Fleet occupancy ring --}}
+            @php($pct = min(100, max(0, $utilization['value'])))
+            @php($ringColor = $pct >= 60 ? '#10b981' : ($pct >= 30 ? '#f59e0b' : '#f43f5e'))
+            <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex size-10 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
+                        <x-filament::icon icon="heroicon-o-key" class="size-5" />
+                    </div>
+                    @include('filament.reports.partials.delta', ['delta' => $utilization['delta']])
+                </div>
+                <p class="mt-4 text-xs font-medium uppercase tracking-wider text-gray-500">Ocupación de la flota</p>
+                <div class="mt-2 flex items-center gap-4">
+                    <div class="relative size-24 shrink-0">
+                        <svg viewBox="0 0 100 100" class="size-24 -rotate-90" aria-hidden="true">
+                            <circle cx="50" cy="50" r="42" fill="none" stroke="#f1f5f9" stroke-width="10" />
+                            <circle cx="50" cy="50" r="42" fill="none" stroke="{{ $ringColor }}" stroke-width="10" stroke-linecap="round"
+                                stroke-dasharray="263.9" stroke-dashoffset="{{ round(263.9 * (1 - $pct / 100), 1) }}" />
+                        </svg>
+                        <span class="absolute inset-0 flex items-center justify-center text-xl font-bold tabular-nums text-gray-950">{{ $utilization['value'] }}%</span>
+                    </div>
+                    <p class="text-xs leading-relaxed text-gray-500">Días rentados sobre los días disponibles de los vehículos publicados.</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Secondary metrics --}}
+        <div class="grid gap-px overflow-hidden rounded-xl border border-gray-200 bg-gray-200 shadow-sm sm:grid-cols-2 xl:grid-cols-4">
+            @foreach ($metrics as $metric)
+                <div class="flex gap-3 bg-white p-4">
+                    <div class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                        <x-filament::icon :icon="$metric['icon']" class="size-[18px]" />
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center justify-between gap-2">
+                            <p class="truncate text-xs font-medium text-gray-500">{{ $metric['label'] }}</p>
+                            @include('filament.reports.partials.delta', ['delta' => $metric['delta']])
+                        </div>
+                        <p class="mt-0.5 text-xl font-bold tabular-nums text-gray-950">{{ $metric['value'] }}</p>
+                        <p class="truncate text-xs text-gray-400">{{ $metric['hint'] }}</p>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</x-filament-widgets::widget>

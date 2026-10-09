@@ -1,0 +1,103 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views/site/**/*.blade.php';
+
+@theme {
+    --font-sans: 'Urbanist', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Default brand colour; the admin can change it (Configuración → Web pública). */
+    --color-brand: #2563eb;
+    --color-brand-dark: #1d4ed8;
+    --color-ink: #101010;
+}
+
+/* Rental calendar (flatpickr, inline) in the brand colours. Every rule is scoped to
+   .flatpickr-calendar.inline so it beats flatpickr's own stylesheet. */
+.flatpickr-calendar.inline {
+    width: 100%;
+    max-width: none;
+    box-shadow: none;
+    border: 1px solid rgb(0 0 0 / 0.1);
+    border-radius: 0.75rem;
+    font-family: var(--font-sans);
+    padding: 0.5rem;
+}
+
+.flatpickr-calendar.inline .flatpickr-days,
+.flatpickr-calendar.inline .dayContainer {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+}
+
+.flatpickr-calendar.inline .flatpickr-day {
+    max-width: none;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+}
+
+.flatpickr-calendar.inline .flatpickr-months .flatpickr-month,
+.flatpickr-calendar.inline .flatpickr-current-month {
+    font-weight: 700;
+    height: 2.75rem;
+}
+
+.flatpickr-calendar.inline span.flatpickr-weekday {
+    font-weight: 700;
+    color: #737373;
+}
+
+/* Past days: just faded */
+.flatpickr-calendar.inline .flatpickr-day.flatpickr-disabled:not(.is-booked) {
+    color: #d4d4d4;
+    text-decoration: none;
+}
+
+.flatpickr-calendar.inline .flatpickr-day.prevMonthDay,
+.flatpickr-calendar.inline .flatpickr-day.nextMonthDay {
+    color: #d4d4d4;
+}
+
+.flatpickr-calendar.inline .flatpickr-day.today:not(.selected):not(.startRange):not(.endRange) {
+    border-color: var(--color-ink);
+}
+
+/* Chosen range */
+.flatpickr-calendar.inline .flatpickr-day.selected,
+.flatpickr-calendar.inline .flatpickr-day.startRange,
+.flatpickr-calendar.inline .flatpickr-day.endRange,
+.flatpickr-calendar.inline .flatpickr-day.selected:hover,
+.flatpickr-calendar.inline .flatpickr-day.startRange:hover,
+.flatpickr-calendar.inline .flatpickr-day.endRange:hover {
+    background: var(--color-brand);
+    border-color: var(--color-brand);
+    color: #fff;
+}
+
+.flatpickr-calendar.inline .flatpickr-day.inRange,
+.flatpickr-calendar.inline .flatpickr-day.inRange:hover {
+    background: #ffe4e4;
+    border-color: #ffe4e4;
+    box-shadow: -5px 0 0 #ffe4e4, 5px 0 0 #ffe4e4;
+    color: var(--color-ink);
+}
+
+.flatpickr-calendar.inline .flatpickr-day:not(.flatpickr-disabled):not(.selected):not(.inRange):hover {
+    background: #f5f5f5;
+    border-color: #f5f5f5;
+}
+
+/* Booked nights: clearly unavailable */
+.flatpickr-calendar.inline .flatpickr-day.is-booked,
+.flatpickr-calendar.inline .flatpickr-day.is-booked:hover {
+    background: #fee2e2;
+    border-color: #fecaca;
+    color: #dc2626;
+    text-decoration: line-through;
+    cursor: not-allowed;
+}

@@ -1,0 +1,306 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+/*
+ * Admin look: dark navy topbar and sidebar, light grey canvas, white
+ * cards with hairline borders, small uppercase labels (Tabler-like palette).
+ */
+:root {
+    --vd-navy: #1e293b;
+    --vd-navy-hover: #273449;
+    --vd-navy-text: #e2e8f0;
+    --vd-navy-muted: #94a3b8;
+    --vd-blue: #206bc4;
+    --vd-canvas: #f6f8fb;
+    --vd-border: #e6e7e9;
+    --vd-ink: #182433;
+    --vd-muted: #667382;
+}
+
+.fi-body {
+    background-color: var(--vd-canvas);
+    color: var(--vd-ink);
+}
+
+/* Topbar */
+.fi-topbar-ctn,
+.fi-topbar {
+    background-color: var(--vd-navy) !important;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+}
+
+.fi-topbar,
+.fi-topbar .fi-icon-btn,
+.fi-topbar .fi-logo,
+.fi-topbar .fi-user-menu-trigger-text {
+    color: #fff;
+}
+
+.fi-topbar .fi-global-search-field .fi-input-wrp {
+    background-color: #111827;
+    border-color: #334155;
+    box-shadow: none;
+}
+
+.fi-topbar .fi-global-search-field input {
+    color: #fff;
+}
+
+/* Sidebar */
+.fi-sidebar,
+.fi-sidebar-header,
+.fi-sidebar-nav {
+    background-color: var(--vd-navy) !important;
+    border: 0 !important;
+}
+
+.fi-sidebar-nav {
+    padding-inline: 0 !important;
+}
+
+.fi-sidebar-group-btn {
+    padding-inline: 1.25rem !important;
+}
+
+.fi-sidebar-group-label,
+.fi-sidebar-group-btn .fi-icon {
+    color: var(--vd-navy-muted) !important;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.fi-sidebar-item-btn {
+    border-radius: 0 !important;
+    padding-inline: 1.25rem !important;
+}
+
+.fi-sidebar-item-label,
+.fi-sidebar-item-icon {
+    color: var(--vd-navy-text) !important;
+    font-weight: 400;
+}
+
+.fi-sidebar-item-btn:hover,
+.fi-sidebar-item-btn:focus-visible {
+    background-color: var(--vd-navy-hover) !important;
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background-color: var(--vd-blue) !important;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+    color: #fff !important;
+    font-weight: 500;
+}
+
+/* Page header and breadcrumbs */
+.fi-breadcrumbs-item-label {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 500;
+}
+
+.fi-breadcrumbs-item:not(:last-child) .fi-breadcrumbs-item-label {
+    color: var(--vd-blue);
+}
+
+.fi-header-heading {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--vd-ink);
+}
+
+/* Cards: sections and tables */
+.fi-section:not(.fi-section-not-contained),
+.fi-ta-ctn {
+    border-radius: 0.375rem !important;
+    box-shadow: none !important;
+    border: 1px solid var(--vd-border) !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+}
+
+.fi-section-header {
+    border-bottom: 1px solid var(--vd-border);
+    padding-block: 1rem !important;
+}
+
+.fi-section-header-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--vd-ink);
+}
+
+/* Small uppercase labels */
+.fi-ta-header-cell,
+.fi-ta-header-cell button,
+.fi-in-entry-label {
+    font-size: 0.6875rem !important;
+    font-weight: 500 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--vd-muted) !important;
+}
+
+.fi-ta-header-cell {
+    background-color: #f8fafc;
+}
+
+.fi-ta-row:hover {
+    background-color: #f8fafc;
+}
+
+/* Solid blue primary buttons */
+.fi-btn.fi-color-primary:not(.fi-btn-outlined) {
+    background-color: var(--vd-blue) !important;
+    color: #fff !important;
+    border-radius: 0.25rem;
+}
+
+.fi-btn.fi-color-primary:not(.fi-btn-outlined):hover {
+    background-color: #1a569d !important;
+}
+
+.fi-btn.fi-color-primary:not(.fi-btn-outlined) .fi-icon {
+    color: #fff !important;
+}
+
+/* Solid badges (green "Completada", etc.) */
+.fi-badge {
+    border-radius: 0.25rem;
+    font-weight: 600;
+}
+
+/*
+ * Sign-in: split screen with the showcase (photo, message, features) on the
+ * left and the form on the right; on phones only the form over a soft canvas.
+ */
+.fi-simple-layout:has(.vd-login-showcase) {
+    background:
+        radial-gradient(40rem 30rem at 100% 0%, rgb(32 107 196 / 0.14), transparent 60%),
+        radial-gradient(36rem 28rem at 0% 100%, rgb(14 165 233 / 0.10), transparent 60%),
+        var(--vd-canvas);
+}
+
+@media (min-width: 64rem) {
+    .fi-simple-layout:has(.vd-login-showcase) {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+        align-items: stretch;
+    }
+
+    .fi-simple-layout:has(.vd-login-showcase) .vd-login-showcase {
+        min-height: 100dvh;
+    }
+
+    /* The showcase already carries the logo. */
+    .fi-simple-layout:has(.vd-login-showcase) .fi-simple-header .fi-logo {
+        display: none;
+    }
+}
+
+.fi-simple-layout:has(.vd-login-showcase) .fi-simple-main-ctn {
+    padding-inline: 1rem;
+}
+
+.fi-simple-layout:has(.vd-login-showcase) .fi-simple-main {
+    max-width: 27rem;
+    border-radius: 1.25rem !important;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 30px 60px -20px rgb(15 23 42 / 0.25), 0 0 0 1px rgb(15 23 42 / 0.05);
+    animation: vd-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (min-width: 40rem) {
+    .fi-simple-layout:has(.vd-login-showcase) .fi-simple-main {
+        padding: 3rem 2.75rem;
+    }
+}
+
+.fi-simple-layout:has(.vd-login-showcase) .fi-simple-header {
+    align-items: flex-start;
+}
+
+.fi-simple-layout:has(.vd-login-showcase) .fi-simple-header-heading {
+    text-align: left;
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.fi-simple-layout:has(.vd-login-showcase) .fi-simple-header-subheading {
+    text-align: left;
+    font-size: 0.9375rem;
+}
+
+.fi-simple-layout:has(.vd-login-showcase) .fi-input-wrp {
+    border-radius: 0.625rem;
+}
+
+.fi-simple-layout:has(.vd-login-showcase) .fi-input {
+    padding-block: 0.7rem;
+}
+
+.fi-simple-layout:has(.vd-login-showcase) .fi-btn.fi-color-primary {
+    padding-block: 0.75rem;
+    border-radius: 0.625rem !important;
+    font-size: 0.9375rem;
+    background-image: linear-gradient(135deg, #206bc4, #1a569d) !important;
+    box-shadow: 0 10px 20px -8px rgb(32 107 196 / 0.6);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fi-simple-layout:has(.vd-login-showcase) .fi-btn.fi-color-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 24px -10px rgb(32 107 196 / 0.7);
+}
+
+.vd-login-photo {
+    animation: vd-zoom 24s ease-in-out infinite alternate;
+}
+
+.vd-login-feature {
+    animation: vd-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes vd-rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+}
+
+@keyframes vd-zoom {
+    from { transform: scale(1); }
+    to { transform: scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vd-login-photo,
+    .vd-login-feature,
+    .fi-simple-layout:has(.vd-login-showcase) .fi-simple-main {
+        animation: none;
+    }
+}
+
+/* Tablets (portrait, about 768px): tables get tighter cells so they fit without sideways scrolling. */
+@media (min-width: 40rem) and (max-width: 79.99rem) {
+    .fi-ta-header-cell {
+        padding-inline: 0.5rem;
+    }
+
+    .fi-ta-cell .fi-ta-text {
+        padding-inline: 0.5rem;
+    }
+}
+
+/* Booking page: the save/status/payment cards go first below the desktop layout. */
+@media (max-width: 63.99rem) {
+    .fi-grid-col:has(> .fi-sc-component > .vd-booking-side) {
+        order: -1;
+    }
+}
