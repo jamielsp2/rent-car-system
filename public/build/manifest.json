@@ -1,0 +1,85 @@
+{
+  "_fonts-DpXy1Uud.css": {
+    "file": "assets/fonts-DpXy1Uud.css",
+    "src": "_fonts-DpXy1Uud.css"
+  },
+  "_urbanist-400-normal-BHTGe-Vj.woff": {
+    "file": "assets/urbanist-400-normal-BHTGe-Vj.woff",
+    "src": "_urbanist-400-normal-BHTGe-Vj.woff"
+  },
+  "_urbanist-400-normal-ClbGNxcV.woff2": {
+    "file": "assets/urbanist-400-normal-ClbGNxcV.woff2",
+    "src": "_urbanist-400-normal-ClbGNxcV.woff2"
+  },
+  "_urbanist-500-normal-CTXUkCRo.woff2": {
+    "file": "assets/urbanist-500-normal-CTXUkCRo.woff2",
+    "src": "_urbanist-500-normal-CTXUkCRo.woff2"
+  },
+  "_urbanist-500-normal-DpQ4Tjrd.woff": {
+    "file": "assets/urbanist-500-normal-DpQ4Tjrd.woff",
+    "src": "_urbanist-500-normal-DpQ4Tjrd.woff"
+  },
+  "_urbanist-600-normal-BuXRW95m.woff2": {
+    "file": "assets/urbanist-600-normal-BuXRW95m.woff2",
+    "src": "_urbanist-600-normal-BuXRW95m.woff2"
+  },
+  "_urbanist-600-normal-cDQtY_pk.woff": {
+    "file": "assets/urbanist-600-normal-cDQtY_pk.woff",
+    "src": "_urbanist-600-normal-cDQtY_pk.woff"
+  },
+  "_urbanist-700-normal-BtsT2zLv.woff2": {
+    "file": "assets/urbanist-700-normal-BtsT2zLv.woff2",
+    "src": "_urbanist-700-normal-BtsT2zLv.woff2"
+  },
+  "_urbanist-700-normal-Zdugn5sa.woff": {
+    "file": "assets/urbanist-700-normal-Zdugn5sa.woff",
+    "src": "_urbanist-700-normal-Zdugn5sa.woff"
+  },
+  "_urbanist-800-normal-1m03Cp15.woff": {
+    "file": "assets/urbanist-800-normal-1m03Cp15.woff",
+    "src": "_urbanist-800-normal-1m03Cp15.woff"
+  },
+  "_urbanist-800-normal-ga5fynFS.woff2": {
+    "file": "assets/urbanist-800-normal-ga5fynFS.woff2",
+    "src": "_urbanist-800-normal-ga5fynFS.woff2"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-PbXlrGvG.css",
+    "name": "app",
+    "names": [
+      "app.css"
+    ],
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/filament/admin/theme.css": {
+    "file": "assets/theme-rJwAnlbD.css",
+    "name": "theme",
+    "names": [
+      "theme.css"
+    ],
+    "src": "resources/css/filament/admin/theme.css",
+    "isEntry": true
+  },
+  "resources/js/admin-booking-calendar.js": {
+    "file": "assets/admin-booking-calendar-BiWqnQtH.js",
+    "name": "admin-booking-calendar",
+    "src": "resources/js/admin-booking-calendar.js",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-BvRk9kiK.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/car-calendar.js": {
+    "file": "assets/car-calendar-R0U6Mu5w.js",
+    "name": "car-calendar",
+    "src": "resources/js/car-calendar.js",
+    "isEntry": true,
+    "css": [
+      "assets/car-calendar-CveviJq_.css"
+    ]
+  }
+}
