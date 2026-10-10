@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Faqs;
 
 use App\Filament\Resources\Faqs\Pages\ManageFaqs;
+use App\Filament\Support\TranslationSection;
 use App\Models\Faq;
 use BackedEnum;
 use Filament\Actions\CreateAction;
@@ -41,6 +42,10 @@ class FaqResource extends Resource
                 Textarea::make('question')->label('Pregunta')->rows(2)->required()->columnSpanFull(),
                 RichEditor::make('answer')->label('Respuesta')->toolbarButtons([['bold', 'italic', 'underline', 'link'], ['bulletList', 'orderedList'], ['undo', 'redo']])->required()->columnSpanFull(),
                 Select::make('status')->label('Estado')->options(['published' => 'Publicado', 'draft' => 'Borrador'])->default('published')->selectablePlaceholder(false)->required(),
+                TranslationSection::make([
+                    'question' => ['label' => 'Pregunta (English)', 'type' => 'textarea'],
+                    'answer' => ['label' => 'Respuesta (English)', 'type' => 'rich', 'toolbar' => [['bold', 'italic', 'underline', 'link'], ['bulletList', 'orderedList'], ['undo', 'redo']]],
+                ])->columnSpanFull(),
             ]);
     }
 

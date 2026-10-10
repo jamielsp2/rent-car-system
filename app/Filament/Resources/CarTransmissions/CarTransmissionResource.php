@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\CarTransmissions;
 
 use App\Filament\Resources\CarTransmissions\Pages\ManageCarTransmissions;
+use App\Filament\Support\TranslationSection;
 use App\Models\CarTransmission;
 use BackedEnum;
 use Filament\Actions\CreateAction;
@@ -39,6 +40,9 @@ class CarTransmissionResource extends Resource
                 TextInput::make('name')->label('Nombre')->placeholder('Automática, Manual...')->required()->maxLength(191)->unique(ignoreRecord: true),
                 TextInput::make('order')->label('Orden')->numeric()->default(0)->minValue(0)->maxValue(127)->helperText('Menor número, primero en las listas.'),
                 Select::make('status')->label('Estado')->options(['published' => 'Publicado', 'draft' => 'Borrador'])->default('published')->selectablePlaceholder(false)->required(),
+                TranslationSection::make([
+                    'name' => ['label' => 'Nombre (English)'],
+                ])->columnSpanFull(),
             ]);
     }
 

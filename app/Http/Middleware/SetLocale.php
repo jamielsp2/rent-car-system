@@ -23,6 +23,7 @@ class SetLocale
             abort(404);
         }
 
+        app()->instance('lang.current', $locale);
         app()->setLocale($locale);
         Carbon::setLocale($locale);
         setlocale(LC_TIME, $locale === 'en' ? 'en_US.UTF-8' : 'es_ES.UTF-8');

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Taxes;
 
 use App\Filament\Resources\Taxes\Pages\ManageTaxes;
+use App\Filament\Support\TranslationSection;
 use App\Models\Tax;
 use BackedEnum;
 use Filament\Actions\CreateAction;
@@ -42,6 +43,9 @@ class TaxResource extends Resource
                 Select::make('amount_type')->label('El monto fijo se cobra')->options(['once' => 'Una vez por reserva', 'per_day' => 'Por cada día'])->default('once')->selectablePlaceholder(false)->required(),
                 TextInput::make('priority')->label('Orden')->numeric()->default(1)->minValue(0),
                 Select::make('status')->label('Estado')->options(['published' => 'Se aplica en las reservas', 'draft' => 'No se aplica'])->default('published')->selectablePlaceholder(false)->required(),
+                TranslationSection::make([
+                    'name' => ['label' => 'Nombre (English)'],
+                ])->columnSpanFull(),
             ]);
     }
 

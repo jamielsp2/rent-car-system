@@ -6,27 +6,28 @@ use App\Models\CarFuel;
 use App\Models\CarMake;
 use App\Models\CarTransmission;
 use App\Models\CarType;
-use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
 /**
- * Writes the web summary and the full description of a vehicle with Groq (OpenAI-compatible API),
- * from the data already filled in the form.
+ * Writes the web summary and the full description of a vehicle with Groq, in Spanish and in
+ * English, from the data already filled in the form.
  */
 class CarCopywriter
 {
-    public static function available(): bool
+    public function __construct(protected Groq $groq)
     {
-        return filled(config('services.groq.key'));
     }
 
-    /** @return array{summary: string, content: string} */
+    public static function available(): bool
+    {
+        return Groq::available();
+    }
+
+    /**
+     * @return array{summary: string, content: string, en: array{summary: string, content: string}}
+     */
     public function generate(array $data): array
     {
-        if (! static::available()) {
-            throw new RuntimeException('Falta la clave de Groq (GROQ_API_KEY en el archivo .env).');
-        }
-
         $facts = $this->facts($data);
 
         if (blank($facts['Nombre'] ?? null)) {
@@ -35,36 +36,19 @@ class CarCopywriter
 
         $lines = collect($facts)->map(fn ($value, $label) => "- {$label}: {$value}")->implode("\n");
 
-        $response = Http::withToken(config('services.groq.key'))
-            ->acceptJson()
-            ->timeout(40)
-            ->post('https://api.groq.com/openai/v1/chat/completions', [
-                'model' => config('services.groq.model'),
-                'temperature' => 0.7,
-                'response_format' => ['type' => 'json_object'],
-                'messages' => [
-                    ['role' => 'system', 'content' => 'Eres redactor de una empresa de renta de vehículos. Escribes en español neutro, tono cercano y profesional, sin exageraciones. Usa SOLO los datos recibidos: no inventes equipamiento, sistemas, tecnología, seguridad, cifras, consumos ni garantías; si faltan datos, escribe menos en vez de rellenar. Responde únicamente un JSON con las claves "summary" y "content".'],
-                    ['role' => 'user', 'content' => "Datos del vehículo:
-{$lines}
+        $json = $this->groq->json([
+            ['role' => 'system', 'content' => 'You write the web copy of a car rental company, once in Spanish (neutral Spanish) and once in English (US). Friendly, professional tone, no exaggeration, optimized for search engines: use the vehicle name and its type naturally, no keyword stuffing. Use ONLY the data received: do not invent equipment, systems, technology, safety features, figures, fuel consumption or warranties; do not describe engine, suspension, equipment or storage spaces; if data is missing, write less instead of filling in. The English text is NOT a literal translation: write it as a native copywriter would, with the same facts. Answer ONLY with a JSON object: {"es": {"summary": "...", "content": "..."}, "en": {"summary": "...", "content": "..."}}.'],
+            ['role' => 'user', 'content' => "Datos del vehículo / Vehicle data:\n{$lines}\n\n" . $this->existing($data) . "\"summary\": 1 or 2 sentences, maximum 300 characters, plain text, shown under the vehicle name and in Google results.\n\"content\": full description in simple HTML using only <p>, <h3>, <ul>, <li> and <strong> (no <h1>, <h2> or styles). IMPORTANT: the summary is already shown right above and the spec sheet (year, seats, doors, mileage, transmission, fuel, rate) already appears on the page, so do NOT repeat the summary nor list those data. Complement it with something different: what kind of trip or customer it is ideal for (city, family, road trips, work...), what the vehicle type feels like to drive or ride in, and useful tips for the renter, without claiming anything that cannot be deduced from the data (speak about general uses and sensations of that type of vehicle). Structure: a hook paragraph with a different angle than the summary, an <h3> section with 3 or 4 uses or advantages as a list, and a short closing inviting to book. Between 100 and 180 words. Write both languages."],
+        ]);
 
-" . $this->existingSummary($data) . "\"summary\": un párrafo de 1 o 2 frases, máximo 300 caracteres, texto plano, para mostrar bajo el nombre y en Google.
-\"content\": descripción completa en HTML simple usando solo <p>, <h3>, <ul>, <li> y <strong> (sin <h1>, <h2> ni estilos). IMPORTANTE: el resumen ya se muestra justo encima y la ficha técnica (año, asientos, puertas, kilometraje, transmisión, combustible, tarifa) ya aparece en la página, así que NO repitas el resumen ni enumeres esos datos. Complementa con algo distinto: para qué tipo de viaje o cliente es ideal (ciudad, familia, carretera, trabajo...), qué se siente al conducirlo o viajar en él según su tipo, y consejos útiles para quien lo va a rentar, sin afirmar nada que no se deduzca de los datos (no describas motor, suspensión, equipamiento ni espacios de almacenamiento concretos; habla de usos y sensaciones generales del tipo de vehículo). Estructura: un párrafo de gancho con otro enfoque que el resumen, un apartado <h3> con 3 o 4 usos o ventajas en lista, y un cierre breve invitando a reservar. Entre 100 y 180 palabras."],
-                ],
-            ]);
+        $es = $this->clean($json['es'] ?? []);
+        $en = $this->clean($json['en'] ?? []);
 
-        if ($response->failed()) {
-            throw new RuntimeException('Groq respondió con error ' . $response->status() . ': ' . ($response->json('error.message') ?? 'sin detalle'));
-        }
-
-        $json = json_decode((string) $response->json('choices.0.message.content'), true);
-        $summary = trim(strip_tags((string) ($json['summary'] ?? '')));
-        $content = $this->cleanHtml((string) ($json['content'] ?? ''));
-
-        if ($summary === '' || $content === '') {
+        if ($es['summary'] === '' || $es['content'] === '' || $en['summary'] === '' || $en['content'] === '') {
             throw new RuntimeException('La IA no devolvió un texto válido. Inténtalo otra vez.');
         }
 
-        return ['summary' => mb_substr($summary, 0, 400), 'content' => $content];
+        return $es + ['en' => $en];
     }
 
     /** @return array<string, string> */
@@ -88,17 +72,21 @@ class CarCopywriter
         ], fn ($value) => filled($value));
     }
 
-    protected function existingSummary(array $data): string
+    protected function existing(array $data): string
     {
         $summary = trim(strip_tags((string) ($data['summary'] ?? '')));
 
-        return $summary === '' ? '' : "Resumen ya escrito (el \"content\" debe decir cosas distintas): {$summary}
-
-";
+        return $summary === '' ? '' : "Resumen ya escrito, el \"content\" debe decir cosas distintas: {$summary}\n\n";
     }
 
-    protected function cleanHtml(string $html): string
+    /** @return array{summary: string, content: string} */
+    protected function clean(mixed $texts): array
     {
-        return trim(strip_tags($html, '<p><h3><ul><ol><li><strong><em><br>'));
+        $texts = is_array($texts) ? $texts : [];
+
+        return [
+            'summary' => mb_substr(trim(strip_tags((string) ($texts['summary'] ?? ''))), 0, 400),
+            'content' => trim(strip_tags((string) ($texts['content'] ?? ''), '<p><h3><ul><ol><li><strong><em><br>')),
+        ];
     }
 }

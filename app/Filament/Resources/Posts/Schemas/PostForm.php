@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Posts\Schemas;
 
+use App\Filament\Support\TranslationSection;
 use App\Models\Post;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
@@ -62,6 +63,12 @@ class PostForm
                                 ->fileAttachmentsVisibility('public')
                                 ->required(),
                         ]),
+
+                    TranslationSection::make([
+                        'name' => ['label' => 'Título (English)'],
+                        'description' => ['label' => 'Resumen (English)', 'type' => 'textarea', 'rows' => 3, 'max' => 400],
+                        'content' => ['label' => 'Contenido (English)', 'type' => 'rich', 'toolbar' => [['bold', 'italic', 'underline', 'link'], ['h2', 'h3', 'blockquote'], ['bulletList', 'orderedList'], ['undo', 'redo']]],
+                    ]),
                 ])->columnSpan(['default' => 3, 'lg' => 2]),
 
                 Group::make([

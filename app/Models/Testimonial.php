@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,11 @@ use Illuminate\Database\Eloquent\Model;
 #[Table('testimonials')]
 class Testimonial extends Model
 {
+    use HasTranslations;
+
+    /** Columns with a version in other languages (see HasTranslations). */
+    protected array $translatable = ['content', 'company'];
+
     protected $fillable = ['name', 'content', 'image', 'company', 'status'];
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Support\Html;
 use App\Support\Media;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -15,6 +16,11 @@ use Illuminate\Support\Str;
 #[Table('posts')]
 class Post extends Model
 {
+    use HasTranslations;
+
+    /** Columns with a version in other languages (see HasTranslations). */
+    protected array $translatable = ['name', 'description', 'content'];
+
     public const TYPE = self::class;
 
     protected $fillable = ['name', 'description', 'content', 'status', 'image', 'is_featured'];

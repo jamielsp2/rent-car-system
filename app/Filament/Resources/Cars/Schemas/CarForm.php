@@ -4,7 +4,9 @@ namespace App\Filament\Resources\Cars\Schemas;
 
 use App\Enums\CarStatus;
 use App\Models\Car;
+use App\Filament\Support\TranslationSection;
 use App\Services\CarCopywriter;
+use App\Support\Lang;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
@@ -52,7 +54,14 @@ class CarForm
                 }
 
                 $set($target, $text[$field]);
-                Notification::make()->success()->title('Texto generado')->body('Revísalo y ajústalo antes de guardar.')->send();
+
+                // The English version is written at the same time, so both stay in sync.
+                if (Lang::multiple()) {
+                    $set("translations.en.{$target}", $text['en'][$field]);
+                }
+
+                Notification::make()->success()->title('Texto generado')
+                    ->body(Lang::multiple() ? 'Se generó en español y en inglés. Revísalo y ajústalo antes de guardar.' : 'Revísalo y ajústalo antes de guardar.')->send();
             });
     }
 
@@ -136,6 +145,12 @@ class CarForm
                                     ['undo', 'redo'],
                                 ]),
                         ]),
+
+                    TranslationSection::make([
+                        'name' => ['label' => 'Nombre (English)'],
+                        'description' => ['label' => 'Resumen (English)', 'type' => 'textarea', 'rows' => 2, 'max' => 400],
+                        'content' => ['label' => 'Descripción completa (English)', 'type' => 'rich'],
+                    ]),
                 ])->columnSpan(['default' => 3, 'lg' => 2]),
 
                 Group::make([

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Enums\BookingStatus;
 use App\Enums\CarStatus;
 use App\Support\Media;
@@ -19,6 +20,11 @@ use Illuminate\Support\Str;
 #[Table('cr_cars')]
 class Car extends Model
 {
+    use HasTranslations;
+
+    /** Columns with a version in other languages (see HasTranslations). */
+    protected array $translatable = ['name', 'description', 'content'];
+
     protected $fillable = [
         'name',
         'description',

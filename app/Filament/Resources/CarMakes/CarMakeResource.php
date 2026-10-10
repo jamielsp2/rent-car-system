@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\CarMakes;
 
 use App\Filament\Resources\CarMakes\Pages\ManageCarMakes;
+use App\Filament\Support\TranslationSection;
 use App\Models\CarMake;
 use BackedEnum;
 use Filament\Actions\CreateAction;
@@ -39,6 +40,9 @@ class CarMakeResource extends Resource
                 TextInput::make('name')->label('Nombre')->required()->maxLength(120)->unique(ignoreRecord: true),
                 TextInput::make('order')->label('Orden')->numeric()->default(0)->minValue(0)->maxValue(127)->helperText('Menor número, primero en las listas.'),
                 Select::make('status')->label('Estado')->options(['published' => 'Publicado', 'draft' => 'Borrador'])->default('published')->selectablePlaceholder(false)->required(),
+                TranslationSection::make([
+                    'name' => ['label' => 'Nombre (English)'],
+                ])->columnSpanFull(),
             ]);
     }
 

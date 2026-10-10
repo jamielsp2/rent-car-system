@@ -40,9 +40,13 @@ class Lang
         return count(static::enabled()) > 1;
     }
 
+    /**
+     * Language of the public page being served. Only the public routes set it (SetLocale);
+     * everything else, the admin included, is Spanish whatever APP_LOCALE says.
+     */
     public static function current(): string
     {
-        return app()->getLocale();
+        return app()->bound('lang.current') ? app('lang.current') : static::DEFAULT;
     }
 
     public static function isDefault(?string $locale = null): bool

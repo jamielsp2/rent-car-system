@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Services;
 
 use App\Enums\ServicePriceType;
 use App\Filament\Resources\Services\Pages\ManageServices;
+use App\Filament\Support\TranslationSection;
 use App\Models\Service;
 use App\Support\Media;
 use App\Support\Money;
@@ -73,6 +74,10 @@ class ServiceResource extends Resource
                     ->visibility('public')
                     ->image()
                     ->maxSize(4096),
+                TranslationSection::make([
+                    'name' => ['label' => 'Nombre (English)'],
+                    'description' => ['label' => 'Descripción corta (English)', 'type' => 'textarea', 'max' => 500],
+                ])->columnSpanFull(),
             ]);
     }
 

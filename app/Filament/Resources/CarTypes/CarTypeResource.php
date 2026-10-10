@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\CarTypes;
 
 use App\Filament\Resources\CarTypes\Pages\ManageCarTypes;
+use App\Filament\Support\TranslationSection;
 use App\Models\CarType;
 use BackedEnum;
 use Filament\Actions\CreateAction;
@@ -39,6 +40,9 @@ class CarTypeResource extends Resource
                 TextInput::make('name')->label('Nombre')->placeholder('SUV, Sedán, Pickup...')->required()->maxLength(191)->unique(ignoreRecord: true),
                 TextInput::make('order')->label('Orden')->numeric()->default(0)->minValue(0)->maxValue(127)->helperText('Menor número, primero en las listas.'),
                 Select::make('status')->label('Estado')->options(['published' => 'Publicado', 'draft' => 'Borrador'])->default('published')->selectablePlaceholder(false)->required(),
+                TranslationSection::make([
+                    'name' => ['label' => 'Nombre (English)'],
+                ])->columnSpanFull(),
             ]);
     }
 

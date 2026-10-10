@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Enums\ServicePriceType;
 use App\Support\Media;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -15,6 +16,11 @@ use Illuminate\Database\Eloquent\Model;
 #[Table('cr_services')]
 class Service extends Model
 {
+    use HasTranslations;
+
+    /** Columns with a version in other languages (see HasTranslations). */
+    protected array $translatable = ['name', 'description'];
+
     protected $fillable = ['name', 'description', 'price', 'price_type', 'image', 'status'];
 
     protected function casts(): array

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -10,5 +11,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 abstract class CarAttribute extends Model
 {
+    use HasTranslations;
+
+    /** Columns with a version in other languages (see HasTranslations). */
+    protected array $translatable = ['name'];
+
     protected $fillable = ['name', 'status', 'order'];
 }

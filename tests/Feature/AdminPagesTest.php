@@ -91,6 +91,25 @@ class AdminPagesTest extends TestCase
         );
     }
 
+    public function test_the_english_version_of_a_car_is_saved_from_the_admin_form(): void
+    {
+        $car = Car::query()->published()->whereHas('slug')->with('slug')->firstOrFail();
+
+        Livewire::test(EditCar::class, ['record' => $car->getKey()])
+            ->fillForm([
+                'translations.en.name' => 'Saved English Name',
+                'translations.en.description' => 'Saved English summary.',
+                'translations.en.content' => '<p>Saved English body</p>',
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $saved = Car::query()->findOrFail($car->getKey());
+        $this->assertSame('Saved English Name', $saved->translation('name', 'en'));
+        $this->assertSame($car->name, $saved->name);
+        $this->get('/en/cars/' . $car->slug->key)->assertSee('Saved English Name')->assertSee('Saved English summary.');
+    }
+
     public function test_customer_pages_render(): void
     {
         $customer = Customer::query()->firstOrFail();

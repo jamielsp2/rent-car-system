@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Testimonials;
 
 use App\Filament\Resources\Testimonials\Pages\ManageTestimonials;
+use App\Filament\Support\TranslationSection;
 use App\Models\Testimonial;
 use BackedEnum;
 use Filament\Actions\CreateAction;
@@ -43,6 +44,10 @@ class TestimonialResource extends Resource
                 Textarea::make('content')->label('Testimonio')->rows(4)->required()->columnSpanFull(),
                 FileUpload::make('image')->label('Foto (opcional)')->disk('media')->directory('testimonials')->visibility('public')->image()->maxSize(4096),
                 Select::make('status')->label('Estado')->options(['published' => 'Publicado', 'draft' => 'Borrador'])->default('published')->selectablePlaceholder(false)->required(),
+                TranslationSection::make([
+                    'company' => ['label' => 'Cargo o empresa (English)'],
+                    'content' => ['label' => 'Testimonio (English)', 'type' => 'textarea', 'rows' => 4, 'max' => 2000],
+                ])->columnSpanFull(),
             ]);
     }
 
