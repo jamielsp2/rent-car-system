@@ -272,6 +272,14 @@ class License
         return time() - (int) (self::state()['checked_at'] ?? 0) >= $interval;
     }
 
+    /** Momento de la última consulta a la plataforma (timestamp), o null si nunca se hizo. */
+    public static function lastCheckedAt(): ?int
+    {
+        $at = (int) (self::state()['checked_at'] ?? 0);
+
+        return $at > 1 ? $at : null;
+    }
+
     /** Anota que se va a consultar, para que peticiones simultáneas no repitan la consulta. */
     public static function markChecked(): void
     {

@@ -6,6 +6,6 @@
         'bg-amber-50 text-amber-900 ring-amber-200 dark:bg-amber-950 dark:text-amber-100 dark:ring-amber-800' => $notice['level'] === 'warning',
     ]) role="alert">
         <span>{{ $notice['message'] }}</span>
-        <a href="{{ route('license.show') }}" class="shrink-0 rounded-lg bg-black/80 px-3 py-1.5 text-white no-underline hover:bg-black dark:bg-white/90 dark:text-black">Activar licencia</a>
+        <a href="{{ \App\Filament\Pages\LicensePage::getUrl() }}" class="shrink-0 rounded-lg bg-black/80 px-3 py-1.5 text-white no-underline hover:bg-black dark:bg-white/90 dark:text-black">Ver licencia</a>
     </div>
 @endif

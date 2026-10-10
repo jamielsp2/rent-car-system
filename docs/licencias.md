@@ -4,6 +4,16 @@ Las licencias las creas tú en la **plataforma de licencias** (carpeta `license-
 
 **La licencia no bloquea el sistema.** Si falta, está suspendida, fue borrada o venció, el panel de administración muestra un aviso fijo —*«Este tenant no está activado. Activa tu licencia…»*— con un botón que lleva a `/licencia`. La web pública y el panel siguen funcionando. El aviso solo se ve en el panel, no en la web pública.
 
+## Página «Licencia» del panel
+
+En el panel de administración, menú **Configuración → Licencia** (`/admin/licencia`):
+
+- **Estado:** si está activa, vencida o suspendida; cliente, tipo (mensual/anual), fecha de vencimiento y días restantes, dominio, código de licencia, hora de la **última consulta** y dónde se guardan los archivos (R2 o este servidor).
+- **Comprobar ahora:** consulta a la plataforma en ese momento (renovaciones, suspensiones).
+- **Cambiar la licencia:** pega un código nuevo y pulsa *Activar licencia*. Reemplaza al actual; si el código no es válido, se rechaza y se conserva el anterior.
+
+El menú muestra un **«!» rojo** junto a *Licencia* mientras haya un aviso rojo. El botón «Ver licencia» del aviso lleva a esta página.
+
 ## Cómo funciona
 
 1. En la plataforma: **Nueva licencia** → cliente, tipo (**mensual** o **anual**), dominio opcional → se genera un código largo que empieza por `RCS1.`.
