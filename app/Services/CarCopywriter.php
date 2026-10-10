@@ -44,7 +44,11 @@ class CarCopywriter
                 'response_format' => ['type' => 'json_object'],
                 'messages' => [
                     ['role' => 'system', 'content' => 'Eres redactor de una empresa de renta de vehículos. Escribes en español neutro, tono cercano y profesional, sin exageraciones. Usa SOLO los datos recibidos: no inventes equipamiento, sistemas, tecnología, seguridad, cifras, consumos ni garantías; si faltan datos, escribe menos en vez de rellenar. Responde únicamente un JSON con las claves "summary" y "content".'],
-                    ['role' => 'user', 'content' => "Datos del vehículo:\n{$lines}\n\n\"summary\": un párrafo de 1 o 2 frases, máximo 300 caracteres, texto plano, para mostrar bajo el nombre y en Google.\n\"content\": descripción completa en HTML simple usando solo <p>, <h3>, <ul>, <li> y <strong> (sin <h1>, <h2> ni estilos): un párrafo de presentación, un apartado con sus características en lista y un cierre invitando a reservar. Entre 120 y 220 palabras."],
+                    ['role' => 'user', 'content' => "Datos del vehículo:
+{$lines}
+
+" . $this->existingSummary($data) . "\"summary\": un párrafo de 1 o 2 frases, máximo 300 caracteres, texto plano, para mostrar bajo el nombre y en Google.
+\"content\": descripción completa en HTML simple usando solo <p>, <h3>, <ul>, <li> y <strong> (sin <h1>, <h2> ni estilos). IMPORTANTE: el resumen ya se muestra justo encima y la ficha técnica (año, asientos, puertas, kilometraje, transmisión, combustible, tarifa) ya aparece en la página, así que NO repitas el resumen ni enumeres esos datos. Complementa con algo distinto: para qué tipo de viaje o cliente es ideal (ciudad, familia, carretera, trabajo...), qué se siente al conducirlo o viajar en él según su tipo, y consejos útiles para quien lo va a rentar, sin afirmar nada que no se deduzca de los datos (no describas motor, suspensión, equipamiento ni espacios de almacenamiento concretos; habla de usos y sensaciones generales del tipo de vehículo). Estructura: un párrafo de gancho con otro enfoque que el resumen, un apartado <h3> con 3 o 4 usos o ventajas en lista, y un cierre breve invitando a reservar. Entre 100 y 180 palabras."],
                 ],
             ]);
 
@@ -82,6 +86,15 @@ class CarCopywriter
             'Tarifa por día' => filled($data['rental_rate'] ?? null) ? '$' . $data['rental_rate'] : null,
             'Renta mínima' => filled($data['min_rental_days'] ?? null) ? $data['min_rental_days'] . ' día(s)' : null,
         ], fn ($value) => filled($value));
+    }
+
+    protected function existingSummary(array $data): string
+    {
+        $summary = trim(strip_tags((string) ($data['summary'] ?? '')));
+
+        return $summary === '' ? '' : "Resumen ya escrito (el \"content\" debe decir cosas distintas): {$summary}
+
+";
     }
 
     protected function cleanHtml(string $html): string

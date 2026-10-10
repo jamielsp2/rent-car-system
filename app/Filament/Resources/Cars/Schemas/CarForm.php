@@ -43,7 +43,7 @@ class CarForm
                         'year' => $get('year'), 'vehicle_type_id' => $get('vehicle_type_id'),
                         'transmission_id' => $get('transmission_id'), 'fuel_type_id' => $get('fuel_type_id'),
                         'number_of_seats' => $get('number_of_seats'), 'number_of_doors' => $get('number_of_doors'),
-                        'mileage' => $get('mileage'), 'rental_rate' => $get('rental_rate'), 'min_rental_days' => $get('min_rental_days'),
+                        'summary' => $get('description'), 'mileage' => $get('mileage'), 'rental_rate' => $get('rental_rate'), 'min_rental_days' => $get('min_rental_days'),
                     ]);
                 } catch (\Throwable $exception) {
                     Notification::make()->danger()->title('No se pudo generar el texto')->body($exception->getMessage())->send();
