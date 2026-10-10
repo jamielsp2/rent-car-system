@@ -121,11 +121,27 @@
                         <p class="text-xs text-gray-400">Usa las flechas de arriba para ver otro día.</p>
                     </div>
                 @else
-                    <ul class="px-5">
-                        @foreach ($column['items'] as $booking)
-                            @include('filament.bookings.handover-row', ['booking' => $booking, 'kind' => $column['kind'], 'last' => $loop->last])
-                        @endforeach
-                    </ul>
+                    @php
+                        $isDelivery = $column['kind'] === 'delivery';
+                        $isDone = fn ($b) => $isDelivery ? \App\Filament\Clusters\Reservas\Pages\TodayHandovers::delivered($b) : \App\Filament\Clusters\Reservas\Pages\TodayHandovers::returned($b);
+                        $groups = [
+                            ['label' => $isDelivery ? 'Por salir' : 'Por recibir', 'dot' => 'bg-amber-400', 'items' => $column['items']->reject($isDone)->values()],
+                            ['label' => $isDelivery ? 'Ya salieron' : 'Ya regresaron', 'dot' => 'bg-emerald-500', 'items' => $column['items']->filter($isDone)->values()],
+                        ];
+                    @endphp
+                    @foreach ($groups as $group)
+                        @if ($group['items']->isNotEmpty())
+                            <div class="flex items-center gap-2 border-b border-gray-100 bg-gray-50 px-5 py-2 text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                <span class="size-2 rounded-full {{ $group['dot'] }}"></span>
+                                {{ $group['label'] }} <span class="text-gray-400">({{ $group['items']->count() }})</span>
+                            </div>
+                            <ul class="px-5">
+                                @foreach ($group['items'] as $booking)
+                                    @include('filament.bookings.handover-row', ['booking' => $booking, 'kind' => $column['kind'], 'last' => $loop->last])
+                                @endforeach
+                            </ul>
+                        @endif
+                    @endforeach
                 @endif
             </div>
         @endforeach
