@@ -8,6 +8,7 @@ use App\Filament\Clusters\Reservas\Pages\BookingDashboard;
 use App\Filament\Clusters\Reservas\Pages\TodayHandovers;
 use App\Filament\Clusters\Reservas\Widgets\BookingsOverview;
 use App\Models\Booking;
+use App\Models\BookingContract;
 use App\Models\Car;
 use App\Models\User;
 use App\Services\BookingStats;
@@ -143,5 +144,17 @@ class BookingsModuleTest extends TestCase
         Livewire::test(TodayHandovers::class)->call('shiftDay', 3)->assertDontSee($delivery->booking_number);
         $delivery->update(['status' => BookingStatus::Delivered]);
         Livewire::test(TodayHandovers::class)->call('shiftDay', 3)->assertSee($delivery->booking_number);
+    }
+
+    public function test_today_shows_vehicles_handed_over_today_even_if_scheduled_for_another_day(): void
+    {
+        $today = Carbon::parse(LocalTime::today()->toDateString());
+        $early = $this->book($today->copy()->addDays(2), $today->copy()->addDays(5));
+        $early->update(['status' => BookingStatus::Delivered]);
+        BookingContract::query()->create(['booking_id' => $early->id, 'signed_at' => now()]);
+
+        Livewire::test(TodayHandovers::class)
+            ->assertSee($early->booking_number)
+            ->assertSee('Ya salieron');
     }
 }

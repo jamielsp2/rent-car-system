@@ -8,6 +8,7 @@ use App\Models\Booking;
 use App\Services\BookingStatusService;
 use App\Support\LocalTime;
 use BackedEnum;
+use Carbon\CarbonImmutable;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
@@ -84,13 +85,26 @@ class TodayHandovers extends Page
         $day = Carbon::parse($this->date);
         $with = ['rental.car', 'contract', 'payment'];
 
+        // Day bounds in UTC, to compare against the contract's system timestamps.
+        $from = CarbonImmutable::parse($day->toDateString(), LocalTime::zone())->startOfDay()->utc();
+        $to = $from->addDay();
+
+        // Scheduled for the day, plus anything actually handed over / returned that day (even if scheduled for another).
         $deliveries = $this->sorted(Booking::query()->with($with)
-            ->whereIn('status', [BookingStatus::Pending, BookingStatus::Confirmed, BookingStatus::Delivered])
-            ->whereHas('rental', fn (Builder $q) => $q->whereDate('rental_start_date', $day))
+            ->whereIn('status', [BookingStatus::Pending, BookingStatus::Confirmed, BookingStatus::Delivered, BookingStatus::Completed])
+            ->where(fn (Builder $q) => $q
+                ->where(fn (Builder $q) => $q
+                    ->whereIn('status', [BookingStatus::Pending, BookingStatus::Confirmed, BookingStatus::Delivered])
+                    ->whereHas('rental', fn (Builder $q) => $q->whereDate('rental_start_date', $day)))
+                ->orWhere(fn (Builder $q) => $q
+                    ->whereIn('status', [BookingStatus::Delivered, BookingStatus::Completed])
+                    ->whereHas('contract', fn (Builder $q) => $q->where('signed_at', '>=', $from)->where('signed_at', '<', $to))))
             ->get(), 'rental_start_date');
         $returns = $this->sorted(Booking::query()->with($with)
             ->whereIn('status', [BookingStatus::Delivered, BookingStatus::Completed])
-            ->whereHas('rental', fn (Builder $q) => $q->whereDate('rental_end_date', $day))
+            ->where(fn (Builder $q) => $q
+                ->whereHas('rental', fn (Builder $q) => $q->whereDate('rental_end_date', $day))
+                ->orWhereHas('contract', fn (Builder $q) => $q->where('returned_at', '>=', $from)->where('returned_at', '<', $to)))
             ->get(), 'rental_end_date');
 
         return [
