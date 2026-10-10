@@ -37,3 +37,16 @@ Marcas, tipos, transmisiones, combustibles, colores, servicios adicionales, FAQ,
 - Idioma distinto del español (textos en vistas y recursos de Filament).
 - Cambios de diseño más allá del color (vistas en `resources/views/site` y `resources/views/components/site`).
 - Panel: tema en `resources/css/filament/admin/theme.css`.
+
+## Generar textos con IA (Groq)
+
+En **Vehículos → Nuevo/Editar → Descripción en la web**, los botones **Generar con IA** escriben el *Resumen* y la *Descripción completa* a partir de los datos ya llenados arriba (nombre, marca, año, tipo, transmisión, combustible, asientos, puertas, kilometraje, tarifa). Si ya hay texto, pide confirmación antes de reemplazarlo. Revisa siempre el resultado antes de guardar.
+
+Requiere una clave de [Groq](https://console.groq.com) en el `.env` del sitio (sin la clave, los botones no aparecen):
+
+```
+GROQ_API_KEY=gsk_...
+# GROQ_MODEL=openai/gpt-oss-120b
+```
+
+No subas la clave a git. En Hostinger, edítala en el `.env` del sitio y recarga la página.

@@ -4,7 +4,12 @@ namespace App\Filament\Resources\Cars\Schemas;
 
 use App\Enums\CarStatus;
 use App\Models\Car;
+use App\Services\CarCopywriter;
+use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Support\Icons\Heroicon;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -18,6 +23,39 @@ use Illuminate\Support\Str;
 
 class CarForm
 {
+    /** "Generar con IA" button: writes `$field` ('summary' or 'content') from the data filled in above. */
+    protected static function aiAction(string $field): Action
+    {
+        $target = $field === 'summary' ? 'description' : 'content';
+
+        return Action::make("generate_{$field}_ai")
+            ->label('Generar con IA')
+            ->icon(Heroicon::OutlinedSparkles)
+            ->color('primary')
+            ->visible(fn () => CarCopywriter::available())
+            ->requiresConfirmation(fn (Get $get) => filled($get($target)))
+            ->modalHeading('Reemplazar el texto actual')
+            ->modalDescription('Ya hay texto escrito. Si continúas se reemplaza por uno nuevo generado con IA.')
+            ->action(function (Get $get, Set $set) use ($field, $target): void {
+                try {
+                    $text = app(CarCopywriter::class)->generate([
+                        'name' => $get('name'), 'make_id' => $get('make_id'), 'model_name' => $get('model_name'),
+                        'year' => $get('year'), 'vehicle_type_id' => $get('vehicle_type_id'),
+                        'transmission_id' => $get('transmission_id'), 'fuel_type_id' => $get('fuel_type_id'),
+                        'number_of_seats' => $get('number_of_seats'), 'number_of_doors' => $get('number_of_doors'),
+                        'mileage' => $get('mileage'), 'rental_rate' => $get('rental_rate'), 'min_rental_days' => $get('min_rental_days'),
+                    ]);
+                } catch (\Throwable $exception) {
+                    Notification::make()->danger()->title('No se pudo generar el texto')->body($exception->getMessage())->send();
+
+                    return;
+                }
+
+                $set($target, $text[$field]);
+                Notification::make()->success()->title('Texto generado')->body('Revísalo y ajústalo antes de guardar.')->send();
+            });
+    }
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -86,9 +124,11 @@ class CarForm
                                 ->label('Resumen')
                                 ->helperText('Aparece debajo del nombre y en Google.')
                                 ->rows(2)
-                                ->maxLength(400),
+                                ->maxLength(400)
+                                ->hintAction(static::aiAction('summary')),
                             RichEditor::make('content')
                                 ->label('Descripción completa')
+                                ->hintAction(static::aiAction('content'))
                                 ->toolbarButtons([
                                     ['bold', 'italic', 'underline'],
                                     ['h2', 'h3'],
