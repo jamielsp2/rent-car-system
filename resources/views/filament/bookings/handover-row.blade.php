@@ -53,7 +53,14 @@
     </div>
 
     {{-- Booking --}}
-    <div @class(['min-w-0 flex-1 rounded-xl border p-3 transition', 'border-emerald-200 bg-emerald-50/40' => $done, 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm' => ! $done])>
+    <div
+        x-data
+        role="link"
+        tabindex="0"
+        title="Ver la reserva completa"
+        x-on:click="if (! $event.target.closest('a, button, input, select, textarea')) window.location.href = @js($editUrl)"
+        x-on:keydown.enter.self="window.location.href = @js($editUrl)"
+        @class(['min-w-0 flex-1 cursor-pointer rounded-xl border p-3 transition', 'border-emerald-200 bg-emerald-50/40' => $done, 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm' => ! $done])>
         <div class="flex gap-3">
             @if ($rental?->car?->cover_url)
                 <img src="{{ $rental->car->cover_url }}" alt="" loading="lazy" class="h-16 w-24 shrink-0 rounded-lg object-cover ring-1 ring-gray-950/5">
