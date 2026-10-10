@@ -23,6 +23,11 @@ class EnsureInstalled
             return redirect()->route('install.show');
         }
 
+        // After a git pull the new migrations apply on their own (no SSH needed).
+        if (config('app.installed') && ! app()->runningUnitTests()) {
+            \App\Support\SchemaUpdater::run();
+        }
+
         return $next($request);
     }
 }

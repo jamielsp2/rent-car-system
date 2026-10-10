@@ -54,5 +54,5 @@ Las fotos subidas desde el admin se guardan en `public/media` (variable `MEDIA_R
 ## Actualizar un cliente existente
 
 1. Empaqueta de nuevo y sube **solo** `app`, `resources`, `routes`, `config`, `database`, `public/build`, `vendor` (si cambió) por encima, **sin tocar** `.env` ni `public/media`.
-2. Si la versión trae migraciones nuevas, ejecútalas con `php artisan migrate --force` (requiere SSH; en planes sin SSH, aplica el SQL de esa migración desde phpMyAdmin).
+2. Si la versión trae migraciones nuevas, **se aplican solas** en la primera visita después del Pull (`App\Support\SchemaUpdater`; deja un archivo `storage/framework/migrated-*` como marca). Si el usuario de la base de datos no puede modificar tablas, ejecuta `php artisan migrate --force` con SSH o aplica el SQL de esa migración desde phpMyAdmin.
 3. Borra `bootstrap/cache/*.php` y `storage/framework/views/*`.
