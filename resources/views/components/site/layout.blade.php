@@ -7,15 +7,15 @@
     $currentCurrency = \App\Support\Money::current();
     $logo = \App\Support\SiteContent::logo();
     $nav = [
-        ['label' => 'Inicio', 'url' => route('site.home'), 'active' => request()->routeIs('site.home')],
-        ['label' => 'Sobre nosotros', 'url' => route('site.about'), 'active' => request()->routeIs('site.about')],
-        ['label' => 'Nuestros vehículos', 'url' => route('site.cars'), 'active' => request()->routeIs('site.cars', 'site.car')],
-        ['label' => 'Preguntas frecuentes', 'url' => route('site.faqs'), 'active' => request()->routeIs('site.faqs')],
-        ['label' => 'Blog', 'url' => route('site.blog'), 'active' => request()->routeIs('site.blog', 'site.post')],
+        ['label' => __('Inicio'), 'url' => lroute('site.home'), 'active' => request()->routeIs('site.home')],
+        ['label' => __('Sobre nosotros'), 'url' => lroute('site.about'), 'active' => request()->routeIs('site.about')],
+        ['label' => __('Nuestros vehículos'), 'url' => lroute('site.cars'), 'active' => request()->routeIs('site.cars', 'site.car')],
+        ['label' => __('Preguntas frecuentes'), 'url' => lroute('site.faqs'), 'active' => request()->routeIs('site.faqs')],
+        ['label' => __('Blog'), 'url' => lroute('site.blog'), 'active' => request()->routeIs('site.blog', 'site.post')],
     ];
 @endphp
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -45,10 +45,22 @@
                 @if ($contact['hours'])
                     <span class="hidden items-center gap-2 text-white/70 md:flex"><x-site.icon name="clock" class="size-4" /> {{ $contact['hours'] }}</span>
                 @endif
+                @if ($alternates = \App\Support\Lang::alternates() and count($alternates) > 1)
+                    <div class="flex items-center gap-1" role="group" aria-label="{{ __('Idioma') }}">
+                        @foreach ($alternates as $locale => $url)
+                            <a href="{{ $url }}" hreflang="{{ $locale }}" lang="{{ $locale }}" title="{{ \App\Support\Lang::label($locale) }}"
+                               @class([
+                                   'rounded px-2 py-0.5 text-xs font-bold uppercase transition',
+                                   'bg-brand text-white' => $locale === app()->getLocale(),
+                                   'text-white/70 hover:text-white' => $locale !== app()->getLocale(),
+                               ])>{{ $locale }}</a>
+                        @endforeach
+                    </div>
+                @endif
                 @if ($currencies->count() > 1)
-                    <div class="flex items-center gap-1" aria-label="Moneda">
+                    <div class="flex items-center gap-1" aria-label="{{ __('Moneda') }}">
                         @foreach ($currencies as $currency)
-                            <a href="{{ route('site.currency', $currency->title) }}" rel="nofollow"
+                            <a href="{{ lroute('site.currency', $currency->title) }}" rel="nofollow"
                                @class([
                                    'rounded px-2 py-0.5 text-xs font-bold transition',
                                    'bg-brand text-white' => $currency->is($currentCurrency),
@@ -64,7 +76,7 @@
     {{-- Header --}}
     <header class="sticky top-0 z-40 border-b border-black/5 bg-white/95 backdrop-blur">
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-3 sm:px-6">
-            <a href="{{ route('site.home') }}" class="shrink-0" aria-label="{{ $siteName }}">
+            <a href="{{ lroute('site.home') }}" class="shrink-0" aria-label="{{ $siteName }}">
                 @if ($logo)
                     <img src="{{ $logo }}" alt="{{ $siteName }}" class="h-14 w-auto">
                 @else
@@ -79,9 +91,9 @@
             </nav>
 
             <div class="flex items-center gap-3">
-                <a href="{{ route('site.cars') }}" class="rounded-lg bg-brand px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark">Reservar</a>
+                <a href="{{ lroute('site.cars') }}" class="rounded-lg bg-brand px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark">{{ __('Reservar') }}</a>
                 <details class="relative md:hidden">
-                    <summary class="flex cursor-pointer list-none items-center rounded-lg border border-black/10 p-2" aria-label="Menú"><x-site.icon name="menu" /></summary>
+                    <summary class="flex cursor-pointer list-none items-center rounded-lg border border-black/10 p-2" aria-label="{{ __('Menú') }}"><x-site.icon name="menu" /></summary>
                     <div class="absolute right-0 mt-2 w-60 rounded-xl border border-black/5 bg-white p-2 shadow-xl">
                         @foreach ($nav as $item)
                             <a href="{{ $item['url'] }}" class="block rounded-lg px-3 py-2 font-medium hover:bg-neutral-100">{{ $item['label'] }}</a>
@@ -116,30 +128,30 @@
                 @endif
                 @if ($contact['phone'])
                     <div class="pt-2">
-                        <p class="flex items-center gap-2 text-white"><x-site.icon name="phone" class="size-4" /> ¿Necesitas ayuda?</p>
+                        <p class="flex items-center gap-2 text-white"><x-site.icon name="phone" class="size-4" /> {{ __('¿Necesitas ayuda?') }}</p>
                         <a href="tel:{{ $contact['phone_href'] }}" class="text-2xl font-bold text-brand">{{ $contact['phone'] }}</a>
                     </div>
                 @endif
             </div>
             <div>
-                <h3 class="mb-4 text-lg font-semibold text-white">Nuestra empresa</h3>
+                <h3 class="mb-4 text-lg font-semibold text-white">{{ __('Nuestra empresa') }}</h3>
                 <ul class="space-y-3">
-                    <li><a href="{{ route('site.about') }}" class="hover:text-white">Sobre nosotros</a></li>
-                    <li><a href="{{ route('site.cars') }}" class="hover:text-white">Nuestros vehículos</a></li>
-                    <li><a href="{{ route('site.faqs') }}" class="hover:text-white">Preguntas frecuentes</a></li>
+                    <li><a href="{{ lroute('site.about') }}" class="hover:text-white">{{ __('Sobre nosotros') }}</a></li>
+                    <li><a href="{{ lroute('site.cars') }}" class="hover:text-white">{{ __('Nuestros vehículos') }}</a></li>
+                    <li><a href="{{ lroute('site.faqs') }}" class="hover:text-white">{{ __('Preguntas frecuentes') }}</a></li>
                 </ul>
             </div>
             <div>
-                <h3 class="mb-4 text-lg font-semibold text-white">Soporte</h3>
+                <h3 class="mb-4 text-lg font-semibold text-white">{{ __('Soporte') }}</h3>
                 <ul class="space-y-3">
                     @if ($contact['whatsapp'])
                         <li><a href="https://wa.me/{{ $contact['whatsapp'] }}" target="_blank" rel="noopener" class="hover:text-white">WhatsApp</a></li>
                     @endif
                     @if ($contact['phone'])
-                        <li><a href="tel:{{ $contact['phone_href'] }}" class="hover:text-white">Llámanos</a></li>
+                        <li><a href="tel:{{ $contact['phone_href'] }}" class="hover:text-white">{{ __('Llámanos') }}</a></li>
                     @endif
                     @if ($contact['email'])
-                        <li><a href="mailto:{{ $contact['email'] }}" class="hover:text-white">Escríbenos</a></li>
+                        <li><a href="mailto:{{ $contact['email'] }}" class="hover:text-white">{{ __('Escríbenos') }}</a></li>
                     @endif
                 </ul>
             </div>

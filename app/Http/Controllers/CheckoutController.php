@@ -59,9 +59,9 @@ class CheckoutController extends Controller
             'services.*' => ['integer'],
             'terms' => ['accepted'],
         ], [
-            'terms.accepted' => 'Debes aceptar los términos y condiciones del alquiler.',
+            'terms.accepted' => __('Debes aceptar los términos y condiciones del alquiler.'),
         ], [
-            'name' => 'nombre', 'email' => 'correo', 'phone' => 'teléfono', 'pickup_time' => 'hora de entrega',
+            'name' => __('nombre'), 'email' => __('correo'), 'phone' => __('teléfono'), 'pickup_time' => __('hora de entrega'), 'from' => __('fecha de salida'), 'to' => __('fecha de devolución'), 'payment_method' => __('forma de pago'),
         ]);
 
         $from = Carbon::parse($data['from'] . ' ' . $data['pickup_time']);
@@ -73,7 +73,7 @@ class CheckoutController extends Controller
             return back()->withInput()->withErrors($exception->errors());
         }
 
-        return redirect()->route('site.booking', $booking->transaction_id);
+        return redirect(lroute('site.booking', $booking->transaction_id));
     }
 
     public function confirmation(string $transaction): View
@@ -108,7 +108,7 @@ class CheckoutController extends Controller
         return collect([PaymentMethod::CashOnDelivery, PaymentMethod::BankTransfer])
             ->filter(fn (PaymentMethod $method) => Setting::get("payment_{$method->value}_status"))
             ->mapWithKeys(fn (PaymentMethod $method) => [$method->value => [
-                'label' => $method->getLabel(),
+                'label' => __($method->getLabel()),
                 'instructions' => trim(strip_tags((string) Setting::get("payment_{$method->value}_description"))) ?: null,
             ]])
             ->all();

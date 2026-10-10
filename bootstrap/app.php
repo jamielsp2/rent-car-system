@@ -5,6 +5,8 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 
+require_once __DIR__.'/../app/helpers.php';
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -17,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Shared hosting answers HTTPS at a proxy in front of PHP; trust its headers
         // so URLs, cookies and the login form use https.
         $middleware->trustProxies(at: '*');
+        $middleware->alias(['locale' => \App\Http\Middleware\SetLocale::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

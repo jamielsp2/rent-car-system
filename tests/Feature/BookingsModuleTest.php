@@ -151,7 +151,7 @@ class BookingsModuleTest extends TestCase
         $today = Carbon::parse(LocalTime::today()->toDateString());
         $early = $this->book($today->copy()->addDays(2), $today->copy()->addDays(5));
         $early->update(['status' => BookingStatus::Delivered]);
-        BookingContract::query()->create(['booking_id' => $early->id, 'signed_at' => now()]);
+        $early->contract()->create(['signed_at' => now()]);
 
         Livewire::test(TodayHandovers::class)
             ->assertSee($early->booking_number)

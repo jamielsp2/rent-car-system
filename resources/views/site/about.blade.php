@@ -1,18 +1,18 @@
-<x-site.layout title="Sobre nosotros">
+<x-site.layout title="{{ __('Sobre nosotros') }}">
     <x-site.page-header
-        title="Sobre nosotros"
-        :eyebrow="'Conoce a ' . \App\Support\SiteContent::name()"
-        subtitle="Somos tus compañeros de viaje: una flota moderna, precios claros y un equipo que te acompaña de la entrega a la devolución."
+        title="{{ __('Sobre nosotros') }}"
+        :eyebrow="__('Conoce a :name', ['name' => \App\Support\SiteContent::name()])"
+        subtitle="{{ __('Somos tus compañeros de viaje: una flota moderna, precios claros y un equipo que te acompaña de la entrega a la devolución.') }}"
         :image="\App\Support\SiteContent::about()['stats'][0]['image']"
     >
         <div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
             <div class="flex flex-wrap gap-3">
-                <a href="{{ route('site.cars') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-3 font-bold text-white transition hover:bg-brand-dark">
-                    Ver vehículos <x-site.icon name="arrow-right" class="size-4" />
+                <a href="{{ lroute('site.cars') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-3 font-bold text-white transition hover:bg-brand-dark">
+                    {{ __('Ver vehículos') }} <x-site.icon name="arrow-right" class="size-4" />
                 </a>
                 @if ($chat = \App\Support\SiteContent::contactUrl())
                     <a href="{{ $chat }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-lg border border-white/25 px-6 py-3 font-bold text-white transition hover:bg-white/10">
-                        <x-site.icon name="phone" class="size-4" /> Escríbenos
+                        <x-site.icon name="phone" class="size-4" /> {{ __('Escríbenos') }}
                     </a>
                 @endif
             </div>
@@ -33,15 +33,15 @@
     <section class="mt-24 bg-neutral-100">
         <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6">
             <div class="mx-auto max-w-2xl text-center">
-                <h2 class="text-3xl font-extrabold sm:text-4xl">¿Por qué elegirnos?</h2>
-                <p class="mt-3 text-lg text-neutral-600">Todo lo que necesitas para rentar sin complicaciones.</p>
+                <h2 class="text-3xl font-extrabold sm:text-4xl">{{ __('¿Por qué elegirnos?') }}</h2>
+                <p class="mt-3 text-lg text-neutral-600">{{ __('Todo lo que necesitas para rentar sin complicaciones.') }}</p>
             </div>
             <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach (config('site.why_us') as $item)
                     <div class="rounded-2xl bg-white p-7">
                         <span class="flex size-12 items-center justify-center rounded-xl bg-brand text-white"><x-site.icon :name="$item['icon']" class="size-6" /></span>
-                        <h3 class="mt-5 text-lg font-bold">{{ $item['title'] }}</h3>
-                        <p class="mt-2 leading-relaxed text-neutral-600">{{ $item['text'] }}</p>
+                        <h3 class="mt-5 text-lg font-bold">{{ __($item['title']) }}</h3>
+                        <p class="mt-2 leading-relaxed text-neutral-600">{{ __($item['text']) }}</p>
                     </div>
                 @endforeach
             </div>
@@ -53,10 +53,10 @@
     <section class="mx-auto max-w-7xl px-4 pb-24 sm:px-6">
         <div class="flex flex-col items-start justify-between gap-6 rounded-2xl bg-black p-10 text-white md:flex-row md:items-center">
             <div>
-                <h2 class="text-3xl font-extrabold">¿Listo para tu próximo viaje?</h2>
-                <p class="mt-2 text-white/70">Elige tu vehículo y resérvalo en minutos.</p>
+                <h2 class="text-3xl font-extrabold">{{ __('¿Listo para tu próximo viaje?') }}</h2>
+                <p class="mt-2 text-white/70">{{ __('Elige tu vehículo y resérvalo en minutos.') }}</p>
             </div>
-            <a href="{{ route('site.cars') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-3 font-bold hover:bg-brand-dark">Ver vehículos <x-site.icon name="arrow-right" class="size-4" /></a>
+            <a href="{{ lroute('site.cars') }}" class="inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-3 font-bold hover:bg-brand-dark">{{ __('Ver vehículos') }} <x-site.icon name="arrow-right" class="size-4" /></a>
         </div>
     </section>
 </x-site.layout>

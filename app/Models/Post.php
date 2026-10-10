@@ -81,7 +81,7 @@ class Post extends Model
 
     protected function url(): Attribute
     {
-        return Attribute::get(fn () => $this->slug ? route('site.post', $this->slug->key) : route('site.blog'));
+        return Attribute::get(fn () => $this->slug ? lroute('site.post', $this->slug->key) : lroute('site.blog'));
     }
 
     protected function imageUrl(): Attribute

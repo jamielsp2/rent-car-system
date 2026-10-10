@@ -29,24 +29,31 @@ Route::get('/media-r2', [MediaController::class, 'show'])->name('media.r2')->wit
     \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
 ]);
 
-Route::get('/', [SiteController::class, 'home'])->name('site.home');
-Route::get('/cars', [SiteController::class, 'cars'])->name('site.cars');
-Route::get('/cars/{key}', [SiteController::class, 'car'])->name('site.car');
-Route::get('/cars/{key}/precio', [SiteController::class, 'quote'])->name('site.car.quote');
-Route::get('/moneda/{code}', [SiteController::class, 'currency'])->where('code', '[A-Za-z]{3}')->name('site.currency');
+// The public site exists in each language: Spanish at the root (site.*) and the others
+// under their prefix (en/..., named en.site.*). See App\Support\Lang.
+$site = function (): void {
+    Route::get('/', [SiteController::class, 'home'])->name('site.home');
+    Route::get('/cars', [SiteController::class, 'cars'])->name('site.cars');
+    Route::get('/cars/{key}', [SiteController::class, 'car'])->name('site.car');
+    Route::get('/cars/{key}/precio', [SiteController::class, 'quote'])->name('site.car.quote');
+    Route::get('/moneda/{code}', [SiteController::class, 'currency'])->where('code', '[A-Za-z]{3}')->name('site.currency');
 
-Route::controller(PageController::class)->group(function (): void {
-    Route::get('/about-us', 'about')->name('site.about');
-    Route::get('/faqs', 'faqs')->name('site.faqs');
-    Route::get('/blog', 'blog')->name('site.blog');
-    Route::get('/news/{key}', 'post')->name('site.post');
-});
+    Route::controller(PageController::class)->group(function (): void {
+        Route::get('/about-us', 'about')->name('site.about');
+        Route::get('/faqs', 'faqs')->name('site.faqs');
+        Route::get('/blog', 'blog')->name('site.blog');
+        Route::get('/news/{key}', 'post')->name('site.post');
+    });
 
-Route::controller(CheckoutController::class)->group(function (): void {
-    Route::get('/reservar/{key}', 'show')->name('site.checkout');
-    Route::post('/reservar/{key}', 'store')->middleware('throttle:10,1')->name('site.checkout.store');
-    Route::get('/reserva/{transaction}', 'confirmation')->name('site.booking');
-});
+    Route::controller(CheckoutController::class)->group(function (): void {
+        Route::get('/reservar/{key}', 'show')->name('site.checkout');
+        Route::post('/reservar/{key}', 'store')->middleware('throttle:10,1')->name('site.checkout.store');
+        Route::get('/reserva/{transaction}', 'confirmation')->name('site.booking');
+    });
+};
+
+Route::middleware('locale:es')->group($site);
+Route::prefix('en')->name('en.')->middleware('locale:en')->group($site);
 
 Route::middleware('auth')
     ->get('admin/reservas/calendario/eventos', [BookingCalendarController::class, 'events'])

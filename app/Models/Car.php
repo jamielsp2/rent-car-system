@@ -208,8 +208,8 @@ class Car extends Model
     protected function publicUrl(): Attribute
     {
         return Attribute::get(fn () => $this->slug
-            ? route('site.car', $this->slug->key)
-            : route('site.cars'));
+            ? lroute('site.car', $this->slug->key)
+            : lroute('site.cars'));
     }
 
     /**

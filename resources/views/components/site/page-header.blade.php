@@ -10,8 +10,8 @@
     <div class="pointer-events-none absolute -bottom-32 -left-24 -z-10 size-96 rounded-full bg-brand/30 blur-3xl"></div>
 
     <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:py-24">
-        <nav aria-label="Ruta" class="flex items-center gap-2 text-sm text-white/60">
-            <a href="{{ route('site.home') }}" class="transition hover:text-white">Inicio</a>
+        <nav aria-label="{{ __('Ruta') }}" class="flex items-center gap-2 text-sm text-white/60">
+            <a href="{{ lroute('site.home') }}" class="transition hover:text-white">{{ __('Inicio') }}</a>
             <x-site.icon name="arrow-right" class="size-3.5" />
             <span class="text-white">{{ $title }}</span>
         </nav>

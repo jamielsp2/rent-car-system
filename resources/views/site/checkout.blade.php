@@ -7,26 +7,26 @@
     $to = Carbon::parse($dates['to']);
     $backUrl = $car->public_url . '?' . http_build_query(['from' => $dates['from'], 'to' => $dates['to'], 'services' => $selected]);
     $number = 'flex size-7 shrink-0 items-center justify-center rounded-full bg-black text-sm font-bold text-white';
-    $period = $from->translatedFormat('j M') . ' → ' . $to->translatedFormat('j M Y') . ' · ' . $quote['days'] . ' ' . ($quote['days'] === 1 ? 'día' : 'días');
+    $period = $from->translatedFormat('j M') . ' → ' . $to->translatedFormat('j M Y') . ' · ' . $quote['days'] . ' ' . ($quote['days'] === 1 ? __('día') : __('días'));
 @endphp
-<x-site.layout :title="'Reservar ' . $car->name">
+<x-site.layout :title="__('Reservar') . ' ' . $car->name">
     <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
-        <a href="{{ $backUrl }}" class="inline-flex items-center gap-1 text-sm text-neutral-500 hover:text-brand">&larr; Volver al vehículo</a>
-        <h1 class="mt-3 text-2xl font-extrabold sm:text-4xl">Completa tu reserva</h1>
+        <a href="{{ $backUrl }}" class="inline-flex items-center gap-1 text-sm text-neutral-500 hover:text-brand">{{ __('&larr; Volver al vehículo') }}</a>
+        <h1 class="mt-3 text-2xl font-extrabold sm:text-4xl">{{ __('Completa tu reserva') }}</h1>
 
         {{-- Where the customer is in the process --}}
         <ol class="mt-5 grid grid-cols-3 gap-2 text-xs font-semibold sm:text-sm">
             <li class="flex flex-col gap-2">
                 <span class="h-1.5 rounded-full bg-brand"></span>
-                <span class="flex items-center gap-1 text-neutral-500"><x-site.icon name="check" class="size-4 text-brand" /> Vehículo y fechas</span>
+                <span class="flex items-center gap-1 text-neutral-500"><x-site.icon name="check" class="size-4 text-brand" /> {{ __('Vehículo y fechas') }}</span>
             </li>
             <li class="flex flex-col gap-2">
                 <span class="h-1.5 rounded-full bg-brand"></span>
-                <span class="text-black">2. Tus datos y pago</span>
+                <span class="text-black">{{ __('2. Tus datos y pago') }}</span>
             </li>
             <li class="flex flex-col gap-2">
                 <span class="h-1.5 rounded-full bg-neutral-200"></span>
-                <span class="text-neutral-400">3. Confirmación</span>
+                <span class="text-neutral-400">{{ __('3. Confirmación') }}</span>
             </li>
         </ol>
 
@@ -40,7 +40,7 @@
                 <p class="text-sm text-neutral-600">{{ $period }}</p>
                 <div class="mt-1 flex items-baseline justify-between gap-2">
                     <span class="text-lg font-extrabold">{{ Money::display($quote['total']) }}</span>
-                    <a href="{{ $backUrl }}" class="text-sm font-semibold text-brand">Cambiar</a>
+                    <a href="{{ $backUrl }}" class="text-sm font-semibold text-brand">{{ __('Cambiar') }}</a>
                 </div>
             </div>
         </div>
@@ -55,7 +55,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('site.checkout.store', $car->slug->key) }}" class="mt-6 grid gap-6 lg:mt-8 lg:grid-cols-[1fr_380px] lg:gap-8">
+        <form method="POST" action="{{ lroute('site.checkout.store', $car->slug->key) }}" class="mt-6 grid gap-6 lg:mt-8 lg:grid-cols-[1fr_380px] lg:gap-8">
             @csrf
             <input type="hidden" name="from" value="{{ $dates['from'] }}">
             <input type="hidden" name="to" value="{{ $dates['to'] }}">
@@ -65,22 +65,22 @@
 
             <div class="space-y-6">
                 <section class="rounded-2xl border border-black/10 p-5 sm:p-6">
-                    <h2 class="flex items-center gap-3 text-xl font-bold"><span class="{{ $number }}">1</span> Tus datos</h2>
+                    <h2 class="flex items-center gap-3 text-xl font-bold"><span class="{{ $number }}">1</span> {{ __('Tus datos') }}</h2>
                     <div class="mt-5 grid gap-4 sm:grid-cols-2">
                         <label class="block sm:col-span-2">
-                            <span class="mb-1 block text-sm font-semibold">Nombre completo *</span>
+                            <span class="mb-1 block text-sm font-semibold">{{ __('Nombre completo *') }}</span>
                             <input name="name" value="{{ old('name') }}" required maxlength="120" autocomplete="name" class="{{ $input }}">
                         </label>
                         <label class="block">
-                            <span class="mb-1 block text-sm font-semibold">Correo electrónico *</span>
+                            <span class="mb-1 block text-sm font-semibold">{{ __('Correo electrónico *') }}</span>
                             <input type="email" name="email" value="{{ old('email') }}" required maxlength="120" autocomplete="email" inputmode="email" class="{{ $input }}">
                         </label>
                         <label class="block">
-                            <span class="mb-1 block text-sm font-semibold">Teléfono / WhatsApp *</span>
+                            <span class="mb-1 block text-sm font-semibold">{{ __('Teléfono / WhatsApp *') }}</span>
                             <input type="tel" name="phone" value="{{ old('phone') }}" required maxlength="25" autocomplete="tel" inputmode="tel" class="{{ $input }}">
                         </label>
                         <label class="block sm:col-span-2">
-                            <span class="mb-1 block text-sm font-semibold">Hora de entrega y devolución *</span>
+                            <span class="mb-1 block text-sm font-semibold">{{ __('Hora de entrega y devolución *') }}</span>
                             <select name="pickup_time" class="{{ $input }}">
                                 @foreach (range(8, 17) as $hour)
                                     @php $value = sprintf('%02d:00', $hour); @endphp
@@ -89,14 +89,14 @@
                             </select>
                         </label>
                         <label class="block sm:col-span-2">
-                            <span class="mb-1 block text-sm font-semibold">Nota (opcional)</span>
-                            <textarea name="note" rows="3" maxlength="1000" placeholder="Lugar de entrega, vuelo, preguntas..." class="{{ $input }}">{{ old('note') }}</textarea>
+                            <span class="mb-1 block text-sm font-semibold">{{ __('Nota (opcional)') }}</span>
+                            <textarea name="note" rows="3" maxlength="1000" placeholder="{{ __('Lugar de entrega, vuelo, preguntas...') }}" class="{{ $input }}">{{ old('note') }}</textarea>
                         </label>
                     </div>
                 </section>
 
                 <section class="rounded-2xl border border-black/10 p-5 sm:p-6">
-                    <h2 class="flex items-center gap-3 text-xl font-bold"><span class="{{ $number }}">2</span> Forma de pago</h2>
+                    <h2 class="flex items-center gap-3 text-xl font-bold"><span class="{{ $number }}">2</span> {{ __('Forma de pago') }}</h2>
                     <div class="mt-5 space-y-3">
                         @foreach ($methods as $value => $method)
                             <label class="flex cursor-pointer gap-3 rounded-xl border border-black/10 p-4 transition has-[:checked]:border-brand has-[:checked]:bg-red-50/40">
@@ -115,7 +115,7 @@
 
             <aside class="lg:sticky lg:top-28 lg:self-start">
                 <div class="rounded-2xl border border-black/10 p-5 shadow-lg sm:p-6">
-                    <h2 class="flex items-center gap-3 text-xl font-bold lg:hidden"><span class="{{ $number }}">3</span> Confirma</h2>
+                    <h2 class="flex items-center gap-3 text-xl font-bold lg:hidden"><span class="{{ $number }}">3</span> {{ __('Confirma') }}</h2>
                     <div class="hidden lg:block">
                         @if ($car->cover_url)
                             <img src="{{ $car->cover_url }}" alt="{{ $car->name }}" class="aspect-[16/10] w-full rounded-xl object-cover">
@@ -128,30 +128,30 @@
                     </div>
 
                     <div class="mt-5 space-y-2 border-t border-black/10 pt-5 text-sm">
-                        <div class="flex justify-between"><span>{{ Money::display($quote['rate']) }} × {{ $quote['days'] }} {{ $quote['days'] === 1 ? 'día' : 'días' }}</span><span>{{ Money::display($quote['rental']) }}</span></div>
+                        <div class="flex justify-between"><span>{{ Money::display($quote['rate']) }} × {{ $quote['days'] }} {{ $quote['days'] === 1 ? __('día') : __('días') }}</span><span>{{ Money::display($quote['rental']) }}</span></div>
                         @foreach ($quote['services'] as $service)
                             <div class="flex justify-between text-neutral-600"><span>{{ $service['name'] }}</span><span>{{ Money::display($service['amount']) }}</span></div>
                         @endforeach
                         @foreach ($quote['taxes'] as $tax)
                             <div class="flex justify-between text-neutral-600"><span>{{ $tax['name'] }}</span><span>{{ Money::display($tax['amount']) }}</span></div>
                         @endforeach
-                        <div class="flex justify-between border-t border-black/10 pt-2 text-lg font-extrabold"><span>Total</span><span>{{ Money::display($quote['total']) }}</span></div>
+                        <div class="flex justify-between border-t border-black/10 pt-2 text-lg font-extrabold"><span>{{ __('Total') }}</span><span>{{ Money::display($quote['total']) }}</span></div>
                         @unless (Money::current()?->is_default ?? true)
-                            <p class="text-neutral-500">Tu reserva se registra en dólares: {{ Money::format($quote['total']) }} USD. El monto en {{ Money::current()->title }} es referencial.</p>
+                            <p class="text-neutral-500">{{ __('Tu reserva se registra en dólares: :total USD. El monto en :currency es referencial.', ['total' => Money::format($quote['total']), 'currency' => Money::current()->title]) }}</p>
                         @endunless
                         @if ($quote['deposit'] > 0)
-                            <p class="text-neutral-500">+ Depósito de garantía reembolsable: {{ Money::display($quote['deposit']) }}</p>
+                            <p class="text-neutral-500">{{ __('+ Depósito de garantía reembolsable: :amount', ['amount' => Money::display($quote['deposit'])]) }}</p>
                         @endif
                     </div>
 
                     <label class="mt-5 flex cursor-pointer gap-3 rounded-xl bg-neutral-100 p-4 text-sm text-neutral-700">
                         <input type="checkbox" name="terms" value="1" @checked(old('terms')) required class="mt-0.5 size-5 shrink-0 accent-brand">
-                        <span>Acepto los términos y condiciones del alquiler. El contrato se firma al recibir el vehículo, presentando licencia de conducir vigente y documento de identidad.</span>
+                        <span>{{ __('Acepto los términos y condiciones del alquiler. El contrato se firma al recibir el vehículo, presentando licencia de conducir vigente y documento de identidad.') }}</span>
                     </label>
 
-                    <button class="mt-5 w-full rounded-xl bg-brand py-4 text-base font-bold text-white transition hover:bg-brand-dark active:scale-[0.99]">Confirmar reserva</button>
+                    <button class="mt-5 w-full rounded-xl bg-brand py-4 text-base font-bold text-white transition hover:bg-brand-dark active:scale-[0.99]">{{ __('Confirmar reserva') }}</button>
                     <p class="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-neutral-500">
-                        <x-site.icon name="check" class="size-4 text-green-600" /> No se cobra nada ahora. Te contactaremos para confirmar.
+                        <x-site.icon name="check" class="size-4 text-green-600" /> {{ __('No se cobra nada ahora. Te contactaremos para confirmar.') }}
                     </p>
                 </div>
             </aside>

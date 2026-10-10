@@ -2,8 +2,8 @@
 @if ($testimonials->isNotEmpty())
     <section {{ $attributes->merge(['class' => 'mx-auto max-w-7xl px-4 py-24 sm:px-6']) }}>
         <div class="text-center">
-            <span class="rounded-full border border-black/10 px-4 py-1.5 text-sm font-semibold">Testimonios</span>
-            <h2 class="mt-4 text-3xl font-extrabold sm:text-4xl">¿Qué dicen de nosotros?</h2>
+            <span class="rounded-full border border-black/10 px-4 py-1.5 text-sm font-semibold">{{ __('Testimonios') }}</span>
+            <h2 class="mt-4 text-3xl font-extrabold sm:text-4xl">{{ __('¿Qué dicen de nosotros?') }}</h2>
         </div>
         <div class="mt-12 grid gap-6 md:grid-cols-3">
             @foreach ($testimonials as $testimonial)

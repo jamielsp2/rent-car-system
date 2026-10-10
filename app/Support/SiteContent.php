@@ -34,9 +34,9 @@ class SiteContent
         $defaults = config('site.hero');
 
         return [
-            'badge' => Setting::get('site_hero_badge', $defaults['badge']),
-            'title' => Setting::get('site_hero_title', $defaults['title']),
-            'subtitle' => Setting::get('site_hero_subtitle', $defaults['subtitle']),
+            'badge' => Lang::setting('site_hero_badge', $defaults['badge']),
+            'title' => Lang::setting('site_hero_title', $defaults['title']),
+            'subtitle' => Lang::setting('site_hero_subtitle', $defaults['subtitle']),
             'image' => Media::url(Setting::get('site_hero_image', $defaults['image'])),
         ];
     }
@@ -58,7 +58,7 @@ class SiteContent
             'whatsapp' => preg_replace('/\D+/', '', (string) Setting::get('site_whatsapp', $defaults['whatsapp'])),
             'email' => (string) Setting::get('site_email', $defaults['email']),
             'address' => (string) Setting::get('site_address', $defaults['address']),
-            'hours' => (string) Setting::get('site_hours', $defaults['hours']),
+            'hours' => (string) Lang::setting('site_hours', $defaults['hours']),
         ];
     }
 
@@ -83,11 +83,11 @@ class SiteContent
         $defaults = config('site.about');
 
         return [
-            'title' => Setting::get('site_about_title', $defaults['title']),
-            'text' => Setting::get('site_about_text', $defaults['text']),
+            'title' => Lang::setting('site_about_title', $defaults['title']),
+            'text' => Lang::setting('site_about_text', $defaults['text']),
             'stats' => collect($defaults['stats'])->map(fn (array $stat, int $i) => [
                 'number' => (string) Setting::get('site_about_stat_' . ($i + 1) . '_number', $stat['number']),
-                'label' => (string) Setting::get('site_about_stat_' . ($i + 1) . '_label', $stat['label']),
+                'label' => (string) Lang::setting('site_about_stat_' . ($i + 1) . '_label', $stat['label']),
                 'image' => Media::url(Setting::get('site_about_stat_' . ($i + 1) . '_image', $stat['image'])),
             ])->all(),
         ];
@@ -95,7 +95,7 @@ class SiteContent
 
     public static function copyright(): string
     {
-        return (string) Setting::get('site_copyright') ?: static::name() . '. Todos los derechos reservados.';
+        return (string) Lang::setting('site_copyright') ?: static::name() . '. ' . __('Todos los derechos reservados.');
     }
 
     /**

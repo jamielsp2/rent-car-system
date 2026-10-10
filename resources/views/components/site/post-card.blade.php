@@ -11,6 +11,6 @@
         @if ($post->description)
             <p class="mt-3 line-clamp-3 text-neutral-600">{{ $post->description }}</p>
         @endif
-        <a href="{{ $post->url }}" class="mt-auto inline-flex items-center gap-2 pt-5 font-bold hover:text-brand">Leer más <x-site.icon name="arrow-right" class="size-4" /></a>
+        <a href="{{ $post->url }}" class="mt-auto inline-flex items-center gap-2 pt-5 font-bold hover:text-brand">{{ __('Leer más') }} <x-site.icon name="arrow-right" class="size-4" /></a>
     </div>
 </article>

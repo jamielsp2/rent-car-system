@@ -31,9 +31,9 @@
             </ul>
         @endif
         <div class="mt-auto flex items-end justify-between gap-3 pt-5">
-            <p><span class="text-2xl font-extrabold">{{ \App\Support\Money::display($car->rental_rate) }}</span> <span class="text-sm text-neutral-500">/ día</span></p>
+            <p><span class="text-2xl font-extrabold">{{ \App\Support\Money::display($car->rental_rate) }}</span> <span class="text-sm text-neutral-500">{{ __('/ día') }}</span></p>
             <span class="inline-flex items-center gap-1.5 rounded-lg bg-neutral-100 px-4 py-2 text-sm font-bold transition group-hover:bg-brand group-hover:text-white">
-                Reservar <x-site.icon name="arrow-right" class="size-4" />
+                {{ __('Reservar') }} <x-site.icon name="arrow-right" class="size-4" />
             </span>
         </div>
     </div>

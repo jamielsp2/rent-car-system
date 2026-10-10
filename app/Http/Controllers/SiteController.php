@@ -62,8 +62,8 @@ class SiteController extends Controller
             'max_price' => ['nullable', 'numeric', 'min:0'],
             'sort' => ['nullable', 'in:recent,price_asc,price_desc,name'],
         ], [
-            'from.after_or_equal' => 'La fecha de salida no puede ser anterior a hoy.',
-            'to.after' => 'La fecha de devolución debe ser después de la salida.',
+            'from.after_or_equal' => __('La fecha de salida no puede ser anterior a hoy.'),
+            'to.after' => __('La fecha de devolución debe ser después de la salida.'),
         ]);
 
         $filters = $validator->valid();
@@ -190,8 +190,8 @@ class SiteController extends Controller
             'services' => ['nullable', 'array'],
             'services.*' => ['integer'],
         ], [
-            'from.after_or_equal' => 'La fecha de salida no puede ser anterior a hoy.',
-            'to.after' => 'La devolución debe ser después de la salida.',
+            'from.after_or_equal' => __('La fecha de salida no puede ser anterior a hoy.'),
+            'to.after' => __('La devolución debe ser después de la salida.'),
         ]);
 
         $dates = $validator->valid();
@@ -225,7 +225,7 @@ class SiteController extends Controller
             $request->session()->put('currency', strtoupper($code));
         }
 
-        return redirect()->back(fallback: route('site.home'));
+        return redirect()->back(fallback: lroute('site.home'));
     }
 
     protected function typesWithCounts()

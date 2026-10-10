@@ -16,11 +16,20 @@ if (element) {
     const warning = document.getElementById('calendar-warning');
     const booked = JSON.parse(element.dataset.booked || '[]');
 
+    // Texts and calendar language come from the page (data-i18n), Spanish when absent.
+    const t = {
+        locale: 'es', day: 'día', days: 'días', departure: 'Salida', chooseReturn: 'Ahora elige la devolución.',
+        choose: t.choose, unavailable: 'No disponible',
+        crossed: 'El vehículo no está disponible en parte de esas fechas. Elige otro rango.',
+        ...JSON.parse(element.dataset.i18n || '{}'),
+    };
+    const language = t.locale === 'es' ? Spanish : undefined;
+
     const minDays = Math.max(1, parseInt(element.dataset.minDays || '1', 10));
     const toKey = (date) => flatpickr.formatDate(date, 'Y-m-d');
     const addDays = (date, days) => { const d = new Date(date); d.setDate(d.getDate() + days); return d; };
     const isBookedDay = (date) => booked.some(({ from, to }) => toKey(date) >= from && toKey(date) <= to);
-    const nice = (date) => flatpickr.formatDate(date, 'D j M Y', Spanish);
+    const nice = (date) => flatpickr.formatDate(date, 'D j M Y', language ?? flatpickr.l10ns.default);
 
     const crossesBooked = (start, end) => booked.some(({ from, to }) => from < toKey(end) && to >= toKey(start));
 
@@ -45,18 +54,18 @@ if (element) {
     const showSummary = (dates) => {
         if (dates.length === 2) {
             const nights = Math.round((dates[1] - dates[0]) / 86400000);
-            summary.innerHTML = `<strong>${nice(dates[0])}</strong> → <strong>${nice(dates[1])}</strong> · ${nights} ${nights === 1 ? 'día' : 'días'}`;
+            summary.innerHTML = `<strong>${nice(dates[0])}</strong> → <strong>${nice(dates[1])}</strong> · ${nights} ${nights === 1 ? t.day : t.days}`;
         } else if (dates.length === 1) {
-            summary.innerHTML = `Salida: <strong>${nice(dates[0])}</strong>. Ahora elige la devolución.`;
+            summary.innerHTML = `${t.departure}: <strong>${nice(dates[0])}</strong>. ${t.chooseReturn}`;
         } else {
-            summary.textContent = 'Elige la fecha de salida y luego la de devolución.';
+            summary.textContent = t.choose;
         }
     };
 
     const picker = flatpickr(element, {
         inline: true,
         mode: 'range',
-        locale: Spanish,
+        locale: language ?? 'default',
         minDate: 'today',
         dateFormat: 'Y-m-d',
         disable: booked,
@@ -66,7 +75,7 @@ if (element) {
                 const key = toKey(day.dateObj);
                 if (booked.some(({ from, to }) => key >= from && key <= to)) {
                     day.classList.add('is-booked');
-                    day.title = 'No disponible';
+                    day.title = t.unavailable;
                 }
             }
         },
@@ -80,7 +89,7 @@ if (element) {
             }
 
             if (dates.length === 2 && crossesBooked(dates[0], dates[1])) {
-                setWarning('El vehículo no está disponible en parte de esas fechas. Elige otro rango.');
+                setWarning(t.crossed);
                 instance.setDate([dates[0]], false);
                 dates = [dates[0]];
             }
