@@ -6,6 +6,7 @@ use App\Filament\Support\TranslationSection;
 use App\Models\Currency;
 use App\Models\Setting;
 use App\Support\Lang;
+use App\Support\SeoFiles;
 use App\Support\SiteContent;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -242,6 +243,7 @@ class SiteSettings extends Page
         $data->put('site_locales', implode(',', array_unique([Lang::DEFAULT, ...array_intersect(array_keys(Lang::SUPPORTED), (array) ($state['site_locales'] ?? []))])));
 
         Setting::put($data->all());
+        SeoFiles::writeRobots(url('/'));
 
         Notification::make()
             ->success()

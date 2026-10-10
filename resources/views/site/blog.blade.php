@@ -1,5 +1,8 @@
-<x-site.layout title="{{ __('Blog') }}">
-    <x-site.page-header title="{{ __('Blog') }}" subtitle="Rutas, consejos y experiencias para tu próximo viaje." />
+@php
+    $seo = ['schema' => \App\Support\Seo::trail('Blog', 'site.blog')];
+@endphp
+<x-site.layout title="{{ __('Blog') }}" :description="__('Rutas, consejos y experiencias para tu próximo viaje.')" :seo="$seo">
+    <x-site.page-header title="{{ __('Blog') }}" subtitle="{{ __('Rutas, consejos y experiencias para tu próximo viaje.') }}" />
 
     <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         @if ($posts->isEmpty())

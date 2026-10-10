@@ -6,7 +6,7 @@
     $specs = array_filter([
         ['icon' => 'gear', 'text' => $car->transmission?->name],
         ['icon' => 'fuel', 'text' => $car->fuel?->name],
-        ['icon' => 'seat', 'text' => $car->number_of_seats ? $car->number_of_seats . ' asientos' : null],
+        ['icon' => 'seat', 'text' => $car->number_of_seats ? __(':count asientos', ['count' => $car->number_of_seats]) : null],
         ['icon' => 'calendar', 'text' => $car->year ?: null],
     ], fn ($spec) => $spec['text']);
 @endphp

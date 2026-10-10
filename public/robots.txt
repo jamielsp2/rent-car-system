@@ -1,2 +1,10 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /instalar
+Disallow: /licencia
+Disallow: /moneda/
+Disallow: /en/moneda/
+Disallow: /reservar/
+Disallow: /en/reservar/
+Disallow: /reserva/
+Disallow: /en/reserva/

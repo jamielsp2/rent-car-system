@@ -1,4 +1,7 @@
-<x-site.layout :title="$post->name . ' - Blog'" :description="$post->description">
+@php
+    $seo = \App\Support\Seo::post($post);
+@endphp
+<x-site.layout :title="$seo['title']" :description="$seo['description']" :seo="$seo">
     <article class="mx-auto max-w-3xl px-4 py-12 sm:px-6">
         <nav class="flex flex-wrap items-center gap-2 text-sm text-neutral-500">
             <a href="{{ lroute('site.home') }}" class="hover:text-brand">{{ __('Inicio') }}</a> <span>/</span>
@@ -6,7 +9,7 @@
         </nav>
 
         <h1 class="mt-5 text-3xl leading-tight font-extrabold sm:text-5xl">{{ $post->name }}</h1>
-        <p class="mt-4 text-neutral-500">{{ $post->created_at?->translatedFormat('d \d\e F, Y') }}</p>
+        <p class="mt-4 text-neutral-500">{{ \App\Support\Lang::date($post->created_at) }}</p>
 
         @if ($post->image_url)
             <img src="{{ $post->image_url }}" alt="{{ $post->name }}" class="mt-8 aspect-[16/9] w-full rounded-2xl object-cover">

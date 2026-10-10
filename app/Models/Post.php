@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasSeo;
 use App\Models\Concerns\HasTranslations;
 use App\Support\Html;
 use App\Support\Media;
@@ -16,7 +17,7 @@ use Illuminate\Support\Str;
 #[Table('posts')]
 class Post extends Model
 {
-    use HasTranslations;
+    use HasSeo, HasTranslations;
 
     /** Columns with a version in other languages (see HasTranslations). */
     protected array $translatable = ['name', 'description', 'content'];

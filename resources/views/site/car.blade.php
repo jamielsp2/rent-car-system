@@ -26,10 +26,11 @@
         'unavailable' => __('No disponible'),
         'crossed' => __('El vehículo no está disponible en parte de esas fechas. Elige otro rango.'),
     ];
+    $seo = \App\Support\Seo::car($car, $photos);
     $from = $dates['from'] ?? LocalTime::today()->addDay()->toDateString();
     $to = $dates['to'] ?? LocalTime::today()->addDays(max(2, $car->min_rental_days + 1))->toDateString();
 @endphp
-<x-site.layout :title="$car->name . ' - ' . __('Alquiler de vehículos')" :description="$car->description">
+<x-site.layout :title="$seo['title']" :description="$seo['description']" :seo="$seo">
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         <nav class="flex flex-wrap items-center gap-2 text-sm text-neutral-500">
             <a href="{{ lroute('site.home') }}" class="hover:text-brand">{{ __('Inicio') }}</a> <span>/</span>

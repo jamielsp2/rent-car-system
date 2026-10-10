@@ -1,4 +1,7 @@
-<x-site.layout title="{{ __('Sobre nosotros') }}">
+@php
+    $seo = ['schema' => [\App\Support\Seo::organization(), ...\App\Support\Seo::trail(__('Sobre nosotros'), 'site.about')]];
+@endphp
+<x-site.layout title="{{ __('Sobre nosotros') }}" :description="\App\Support\SiteContent::about()['text']" :seo="$seo">
     <x-site.page-header
         title="{{ __('Sobre nosotros') }}"
         :eyebrow="__('Conoce a :name', ['name' => \App\Support\SiteContent::name()])"

@@ -4,10 +4,13 @@
     $chip = 'flex cursor-pointer items-center gap-2 rounded-full border border-black/10 bg-white px-3.5 py-2 text-sm font-medium transition select-none hover:border-black/30 has-[:checked]:border-brand has-[:checked]:bg-brand has-[:checked]:text-white has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-brand';
     $field = 'w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-base focus:border-brand focus:ring-brand sm:text-sm';
 @endphp
-<x-site.layout title="{{ __('Nuestros vehículos') }}">
+@php
+    $seo = ['schema' => \App\Support\Seo::trail(__('Nuestros vehículos'), 'site.cars')];
+@endphp
+<x-site.layout title="{{ __('Nuestros vehículos') }}" :description="__('Vehículos listos para tu próximo viaje. Elige tus fechas y reserva en minutos.')" :seo="$seo">
     <x-site.page-header
         title="{{ __('Nuestros vehículos') }}"
-        eyebrow="Flota disponible"
+        eyebrow="{{ __('Flota disponible') }}"
         subtitle="{{ __('Vehículos listos para tu próximo viaje. Elige tus fechas y reserva en minutos.') }}"
         :image="$heroImage"
     >
@@ -102,7 +105,7 @@
                     <legend class="mb-3 text-sm font-bold tracking-wide uppercase">{{ __('Precio por día') }}</legend>
                     <div class="grid grid-cols-2 gap-2">
                         <input type="number" inputmode="numeric" name="min_price" min="0" placeholder="{{ __('Mín.') }}" value="{{ $filters['min_price'] ?? '' }}" class="{{ $field }}" aria-label="{{ __('Precio mínimo') }}">
-                        <input type="number" inputmode="numeric" name="max_price" min="0" placeholder="Máx. {{ $maxRate }}" value="{{ $filters['max_price'] ?? '' }}" class="{{ $field }}" aria-label="{{ __('Precio máximo') }}">
+                        <input type="number" inputmode="numeric" name="max_price" min="0" placeholder="{{ __('Máx. :amount', ['amount' => $maxRate]) }}" value="{{ $filters['max_price'] ?? '' }}" class="{{ $field }}" aria-label="{{ __('Precio máximo') }}">
                     </div>
                 </fieldset>
 
@@ -159,8 +162,8 @@
             @elseif (! empty($filters['from']))
                 <p class="mb-6 flex items-center gap-3 rounded-xl bg-neutral-100 p-4 text-neutral-700">
                     <x-site.icon name="calendar" class="size-5 text-brand" />
-                    <span>{{ __('Vehículos libres del') }} <strong>{{ \Illuminate\Support\Carbon::parse($filters['from'])->format('d/m/Y') }}</strong>
-                    @if (! empty($filters['to'])) {{ __('al') }} <strong>{{ \Illuminate\Support\Carbon::parse($filters['to'])->format('d/m/Y') }}</strong>@endif.</span>
+                    <span>{{ __('Vehículos libres del') }} <strong>{{ \App\Support\Lang::numericDate(\Illuminate\Support\Carbon::parse($filters['from'])) }}</strong>
+                    @if (! empty($filters['to'])) {{ __('al') }} <strong>{{ \App\Support\Lang::numericDate(\Illuminate\Support\Carbon::parse($filters['to'])) }}</strong>@endif.</span>
                 </p>
             @endif
 

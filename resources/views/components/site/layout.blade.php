@@ -13,14 +13,54 @@
         ['label' => __('Preguntas frecuentes'), 'url' => lroute('site.faqs'), 'active' => request()->routeIs('site.faqs')],
         ['label' => __('Blog'), 'url' => lroute('site.blog'), 'active' => request()->routeIs('site.blog', 'site.post')],
     ];
+
+    // What search engines are told about this page (see App\Support\Seo); pages pass a `seo` array.
+    $seo = $seo ?? [];
+    $schemas = array_filter($seo['schema'] ?? []);
+    $pageTitle = ($seo['title_full'] ?? null) ?: (isset($title) ? $title . ' - ' . $siteName : $siteName . ' - ' . $hero['title']);
+    $pageDescription = \App\Support\Seo::description($seo['description'] ?? $description ?? $hero['subtitle']);
+    $noindex = ($seo['noindex'] ?? false) || \App\Support\Seo::isFiltered();
+    $canonicalUrl = \App\Support\Seo::canonical();
+    $alternateUrls = $noindex ? [] : \App\Support\Seo::alternates($seo['locales'] ?? null);
+    $ogImage = \App\Support\Seo::absolute($seo['image'] ?? $hero['image'] ?? $logo);
+    $seoType = $seo['type'] ?? 'website';
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ isset($title) ? $title . ' - ' . $siteName : $siteName . ' - ' . $hero['title'] }}</title>
-    <meta name="description" content="{{ $description ?? $hero['subtitle'] }}">
+    <title>{{ $pageTitle }}</title>
+    <meta name="description" content="{{ $pageDescription }}">
+    <meta name="robots" content="{{ $noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large' }}">
+    <link rel="canonical" href="{{ $canonicalUrl }}">
+    @foreach ($alternateUrls as $locale => $url)
+        <link rel="alternate" hreflang="{{ $locale }}" href="{{ $url }}">
+    @endforeach
+    @if ($alternateUrls)
+        <link rel="alternate" hreflang="x-default" href="{{ $alternateUrls[\App\Support\Lang::DEFAULT] ?? reset($alternateUrls) }}">
+    @endif
+    <meta property="og:site_name" content="{{ $siteName }}">
+    <meta property="og:type" content="{{ $seoType }}">
+    <meta property="og:title" content="{{ $pageTitle }}">
+    <meta property="og:description" content="{{ $pageDescription }}">
+    <meta property="og:url" content="{{ $canonicalUrl }}">
+    <meta property="og:locale" content="{{ \App\Support\Lang::region() }}">
+    @foreach ($alternateUrls as $locale => $url)
+        @if ($locale !== app()->getLocale())
+            <meta property="og:locale:alternate" content="{{ \App\Support\Lang::region($locale) }}">
+        @endif
+    @endforeach
+    @if ($ogImage)
+        <meta property="og:image" content="{{ $ogImage }}">
+        <meta name="twitter:image" content="{{ $ogImage }}">
+    @endif
+    <meta name="twitter:card" content="{{ $ogImage ? 'summary_large_image' : 'summary' }}">
+    <meta name="twitter:title" content="{{ $pageTitle }}">
+    <meta name="twitter:description" content="{{ $pageDescription }}">
+    @foreach ($schemas as $schema)
+        <script type="application/ld+json">{!! \App\Support\Seo::json($schema) !!}</script>
+    @endforeach
     @if ($favicon = \App\Support\SiteContent::favicon())
         <link rel="icon" href="{{ $favicon }}">
     @endif

@@ -9,7 +9,7 @@
     $number = 'flex size-7 shrink-0 items-center justify-center rounded-full bg-black text-sm font-bold text-white';
     $period = $from->translatedFormat('j M') . ' → ' . $to->translatedFormat('j M Y') . ' · ' . $quote['days'] . ' ' . ($quote['days'] === 1 ? __('día') : __('días'));
 @endphp
-<x-site.layout :title="__('Reservar') . ' ' . $car->name">
+<x-site.layout :title="__('Reservar') . ' ' . $car->name" :seo="['noindex' => true]">
     <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
         <a href="{{ $backUrl }}" class="inline-flex items-center gap-1 text-sm text-neutral-500 hover:text-brand">{{ __('&larr; Volver al vehículo') }}</a>
         <h1 class="mt-3 text-2xl font-extrabold sm:text-4xl">{{ __('Completa tu reserva') }}</h1>

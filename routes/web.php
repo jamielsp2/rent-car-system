@@ -8,6 +8,7 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 Route::controller(InstallController::class)->group(function (): void {
@@ -51,6 +52,10 @@ $site = function (): void {
         Route::get('/reserva/{transaction}', 'confirmation')->name('site.booking');
     });
 };
+
+// Same list under two names: on shared hosting a missing .xml never reaches PHP, so robots.txt points to /sitemap.
+Route::get('/sitemap', SitemapController::class)->name('sitemap');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap.xml');
 
 Route::middleware('locale:es')->group($site);
 Route::prefix('en')->name('en.')->middleware('locale:en')->group($site);

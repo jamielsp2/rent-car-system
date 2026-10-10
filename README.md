@@ -46,6 +46,7 @@ php artisan serve
 |---|---|
 | [docs/instalacion.md](docs/instalacion.md) | Instalación local, asistente web, comando y variables de entorno |
 | [docs/despliegue-hostinger.md](docs/despliegue-hostinger.md) | Subir un cliente nuevo a Hostinger / hosting compartido y problemas conocidos |
+| [docs/idiomas.md](docs/idiomas.md) | Web en español e inglés: selector, contenido traducible, generación con IA y SEO (hreflang, sitemap, datos estructurados) |
 | [docs/licencias.md](docs/licencias.md) | Licencias mensuales/anuales: crear, activar, renovar y suspender desde la plataforma de licencias |
 | [docs/almacenamiento.md](docs/almacenamiento.md) | Fotos y contratos en un bucket de Cloudflare R2 por cliente: qué es público, qué es privado y cómo se configura |
 | [docs/personalizacion.md](docs/personalizacion.md) | Marca, colores, textos, pagos, contrato, monedas e impuestos de cada cliente |

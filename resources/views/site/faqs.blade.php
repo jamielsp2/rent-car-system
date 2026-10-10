@@ -1,8 +1,11 @@
-<x-site.layout title="{{ __('Preguntas frecuentes') }}">
+@php
+    $seo = ['schema' => \App\Support\Seo::faqs($faqs)];
+@endphp
+<x-site.layout title="{{ __('Preguntas frecuentes') }}" :description="__('Requisitos, pagos, seguros, entregas y devoluciones: todo lo que necesitas saber antes de rentar.')" :seo="$seo">
     <x-site.page-header
         title="{{ __('Preguntas frecuentes') }}"
-        eyebrow="Centro de ayuda"
-        subtitle="Requisitos, pagos, seguros, entregas y devoluciones: todo lo que necesitas saber antes de rentar."
+        eyebrow="{{ __('Centro de ayuda') }}"
+        subtitle="{{ __('Requisitos, pagos, seguros, entregas y devoluciones: todo lo que necesitas saber antes de rentar.') }}"
         :image="\App\Support\SiteContent::about()['stats'][1]['image']"
     >
         <div class="flex max-w-3xl flex-col gap-4 sm:flex-row sm:items-center">

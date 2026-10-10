@@ -6,7 +6,7 @@
         @endif
     </a>
     <div class="flex flex-1 flex-col p-6">
-        <p class="text-sm text-neutral-500">{{ $post->created_at?->translatedFormat('d \d\e F, Y') }}</p>
+        <p class="text-sm text-neutral-500">{{ \App\Support\Lang::date($post->created_at) }}</p>
         <h3 class="mt-2 text-xl leading-snug font-bold"><a href="{{ $post->url }}" class="hover:text-brand">{{ $post->name }}</a></h3>
         @if ($post->description)
             <p class="mt-3 line-clamp-3 text-neutral-600">{{ $post->description }}</p>

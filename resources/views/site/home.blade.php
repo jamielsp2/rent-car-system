@@ -2,8 +2,9 @@
     $hero = \App\Support\SiteContent::hero();
     $today = \App\Support\LocalTime::today();
     $invitations = config('site.invitations');
+    $seo = ['schema' => [\App\Support\Seo::organization()]];
 @endphp
-<x-site.layout>
+<x-site.layout :seo="$seo">
     {{-- Hero with search --}}
     <section class="relative isolate overflow-hidden bg-black">
         @if ($hero['image'])

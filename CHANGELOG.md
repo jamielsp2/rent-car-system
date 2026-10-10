@@ -1,5 +1,13 @@
 # Changelog
 
+## Sin publicar
+
+- Web pública en español e inglés: español en la raíz e inglés en `/en`, selector ES | EN que lleva a la misma página, idiomas activables desde *Web pública*.
+- Contenido traducible (vehículos, blog, preguntas, servicios, testimonios, catálogos, textos de la web) con sección *English* en el panel, **Traducir desde español** y **Generar con IA** bilingüe (Groq).
+- SEO por idioma: título y descripción para Google, canonical, `hreflang`, Open Graph, datos estructurados (AutoRental, Car/Offer, FAQPage, BlogPosting, BreadcrumbList), `sitemap`, `robots.txt` y `noindex` donde corresponde.
+- Reservas > Hoy: grupos *Por salir / Ya salieron*, tarjetas clicables, y vehículos entregados o devueltos ese día aunque estuvieran programados para otro.
+- Botón **Generar con IA** (Groq) en el resumen y la descripción de cada vehículo.
+
 ## 1.0.0 — Primera versión publicada
 
 Versión "limpia" y reutilizable para desplegar a distintos clientes.

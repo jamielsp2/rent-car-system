@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Cars\Schemas;
 
 use App\Enums\CarStatus;
 use App\Models\Car;
+use App\Filament\Support\SeoSection;
 use App\Filament\Support\TranslationSection;
 use App\Services\CarCopywriter;
 use App\Support\Lang;
@@ -151,6 +152,8 @@ class CarForm
                         'description' => ['label' => 'Resumen (English)', 'type' => 'textarea', 'rows' => 2, 'max' => 400],
                         'content' => ['label' => 'Descripción completa (English)', 'type' => 'rich'],
                     ]),
+
+                    SeoSection::make(withAi: true),
                 ])->columnSpan(['default' => 3, 'lg' => 2]),
 
                 Group::make([

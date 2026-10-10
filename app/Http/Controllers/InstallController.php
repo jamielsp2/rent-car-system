@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Support\DatabaseSetup;
 use App\Support\EnvFile;
+use App\Support\SeoFiles;
 use App\Support\Installer;
 use Filament\Notifications\Notification;
 use Illuminate\Http\RedirectResponse;
@@ -66,6 +67,7 @@ class InstallController extends Controller
 
             // Last, so a failed attempt can be retried from the wizard.
             EnvFile::set(['APP_INSTALLED' => 'true']);
+            SeoFiles::writeRobots($data['app_url']);
         } catch (ValidationException $exception) {
             return back()->withInput($request->except(['password', 'admin_password', 'admin_password_confirmation']))
                 ->withErrors($exception->errors());

@@ -132,4 +132,26 @@ class Lang
 
         return $saved;
     }
+
+    /** Long date of the language being shown: "10 de octubre, 2026" / "October 10, 2026". */
+    public static function date(?\DateTimeInterface $date): string
+    {
+        if (! $date) {
+            return '';
+        }
+
+        $date = \Illuminate\Support\Carbon::instance($date)->locale(static::current());
+
+        return static::isDefault() ? $date->translatedFormat('d \d\e F, Y') : $date->translatedFormat('F j, Y');
+    }
+
+    /** Numeric date (and time) of the language being shown: 10/10/2026 or 10/10/2026 09:00 AM, month first in English. */
+    public static function numericDate(?\DateTimeInterface $date, bool $time = false): string
+    {
+        if (! $date) {
+            return '';
+        }
+
+        return $date->format((static::isDefault() ? 'd/m/Y' : 'm/d/Y') . ($time ? ' h:i A' : ''));
+    }
 }

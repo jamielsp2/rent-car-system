@@ -5,13 +5,13 @@
     $message = __('Hola, acabo de hacer la reserva :number del :car (:from - :to). Total: :total. Nombre: :name.', [
         'number' => $booking->booking_number,
         'car' => $rental?->car_name,
-        'from' => $rental?->rental_start_date?->format('d/m/Y h:i A'),
-        'to' => $rental?->rental_end_date?->format('d/m/Y h:i A'),
+        'from' => \App\Support\Lang::numericDate($rental?->rental_start_date, true),
+        'to' => \App\Support\Lang::numericDate($rental?->rental_end_date, true),
         'total' => Money::display($booking->amount),
         'name' => $booking->customer_name,
     ]);
 @endphp
-<x-site.layout :title="__('Reserva') . ' ' . $booking->booking_number">
+<x-site.layout :title="__('Reserva') . ' ' . $booking->booking_number" :seo="['noindex' => true]">
     <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <div class="text-center">
             <span class="mx-auto flex size-16 items-center justify-center rounded-full bg-green-100 text-green-600"><x-site.icon name="check" class="size-8" /></span>
@@ -23,8 +23,8 @@
             <dl class="grid gap-4 sm:grid-cols-2">
                 <div><dt class="text-sm text-neutral-500">{{ __('Vehículo') }}</dt><dd class="font-bold">{{ $rental?->car_name }}</dd></div>
                 <div><dt class="text-sm text-neutral-500">{{ __('Cliente') }}</dt><dd class="font-bold">{{ $booking->customer_name }}</dd></div>
-                <div><dt class="text-sm text-neutral-500">{{ __('Salida') }}</dt><dd class="font-bold">{{ $rental?->rental_start_date?->format('d/m/Y h:i A') }}</dd></div>
-                <div><dt class="text-sm text-neutral-500">{{ __('Devolución') }}</dt><dd class="font-bold">{{ $rental?->rental_end_date?->format('d/m/Y h:i A') }}</dd></div>
+                <div><dt class="text-sm text-neutral-500">{{ __('Salida') }}</dt><dd class="font-bold">{{ \App\Support\Lang::numericDate($rental?->rental_start_date, true) }}</dd></div>
+                <div><dt class="text-sm text-neutral-500">{{ __('Devolución') }}</dt><dd class="font-bold">{{ \App\Support\Lang::numericDate($rental?->rental_end_date, true) }}</dd></div>
                 <div><dt class="text-sm text-neutral-500">{{ __('Forma de pago') }}</dt><dd class="font-bold">{{ __($booking->payment?->payment_channel?->getLabel() ?? '') }}</dd></div>
                 <div><dt class="text-sm text-neutral-500">{{ __('Total') }}</dt><dd class="text-xl font-extrabold">{{ Money::display($booking->amount) }}</dd></div>
             </dl>
