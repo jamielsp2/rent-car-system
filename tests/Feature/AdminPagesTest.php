@@ -156,6 +156,26 @@ class AdminPagesTest extends TestCase
         $this->assertSame('Renta tu carro hoy', SiteContent::hero()['title']);
     }
 
+    public function test_site_settings_save_the_english_texts_and_the_enabled_languages(): void
+    {
+        Livewire::test(SiteSettings::class)
+            ->fillForm([
+                'site_hero_title' => 'Renta tu carro hoy',
+                'site_hero_title_en' => 'Rent your car today',
+                'site_locales' => ['es', 'en'],
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->get('/en')->assertOk()->assertSee('Rent your car today');
+        $this->get('/')->assertSee('Renta tu carro hoy')->assertDontSee('Rent your car today');
+
+        // Spanish can never be switched off, and a site can be left in one language only.
+        Livewire::test(SiteSettings::class)->fillForm(['site_locales' => []])->call('save')->assertHasNoFormErrors();
+        $this->assertSame(['es'], \App\Support\Lang::enabled());
+        $this->get('/en')->assertNotFound();
+    }
+
     public function test_blog_posts_can_be_written_from_the_admin(): void
     {
         Livewire::test(CreatePost::class)

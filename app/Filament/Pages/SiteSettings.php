@@ -2,11 +2,14 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Support\TranslationSection;
 use App\Models\Currency;
 use App\Models\Setting;
+use App\Support\Lang;
 use App\Support\SiteContent;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -48,6 +51,25 @@ class SiteSettings extends Page
         'site_about_stat_3_number', 'site_about_stat_3_label',
         'site_facebook', 'site_instagram', 'site_copyright',
         'site_default_currency',
+        // English version of the texts above (see TRANSLATABLE).
+        'site_hero_badge_en', 'site_hero_title_en', 'site_hero_subtitle_en', 'site_hours_en',
+        'site_about_title_en', 'site_about_text_en',
+        'site_about_stat_1_label_en', 'site_about_stat_2_label_en', 'site_about_stat_3_label_en',
+        'site_copyright_en',
+    ];
+
+    /** Texts that exist in English too: Spanish setting => form label (the English one is saved as "{key}_en"). */
+    protected const TRANSLATABLE = [
+        'site_hero_badge' => ['label' => 'Etiqueta de la portada (English)'],
+        'site_hero_title' => ['label' => 'Título de la portada (English)'],
+        'site_hero_subtitle' => ['label' => 'Subtítulo de la portada (English)', 'type' => 'textarea', 'rows' => 3, 'max' => 300],
+        'site_hours' => ['label' => 'Horario (English)', 'max' => 120],
+        'site_about_title' => ['label' => 'Sobre nosotros: título (English)', 'max' => 150],
+        'site_about_text' => ['label' => 'Sobre nosotros: texto (English)', 'type' => 'textarea', 'rows' => 4, 'max' => 1500],
+        'site_about_stat_1_label' => ['label' => 'Qué mide la cifra 1 (English)', 'max' => 60],
+        'site_about_stat_2_label' => ['label' => 'Qué mide la cifra 2 (English)', 'max' => 60],
+        'site_about_stat_3_label' => ['label' => 'Qué mide la cifra 3 (English)', 'max' => 60],
+        'site_copyright' => ['label' => 'Texto de derechos (English)', 'max' => 150],
     ];
 
     public ?array $data = [];
@@ -79,7 +101,12 @@ class SiteSettings extends Page
             'site_instagram' => $social['instagram'],
             'site_copyright' => Setting::get('site_copyright'),
             'site_default_currency' => Setting::get('site_default_currency', Currency::default()?->title),
+            'site_locales' => Lang::enabled(),
         ];
+
+        foreach (array_keys(self::TRANSLATABLE) as $key) {
+            $state[$key . '_en'] = Setting::get($key . '_en');
+        }
 
         foreach ([1, 2, 3] as $n) {
             $state["site_about_stat_{$n}_number"] = $about['stats'][$n - 1]['number'];
@@ -163,6 +190,20 @@ class SiteSettings extends Page
                         TextInput::make('site_copyright')->label('Texto de derechos')->maxLength(150)->placeholder('Tu negocio. Todos los derechos reservados.')->columnSpanFull(),
                     ]),
 
+                Section::make('Idiomas')
+                    ->description('Idiomas en que se muestra la web. Con más de uno aparece el selector ES | EN en la barra superior, y cada idioma tiene su propia dirección (/en/...) para Google.')
+                    ->schema([
+                        CheckboxList::make('site_locales')
+                            ->hiddenLabel()
+                            ->options(Lang::SUPPORTED)
+                            ->helperText('El español siempre está activo: es el idioma base de la web.')
+                            ->default([Lang::DEFAULT])
+                            ->columns(2),
+                    ]),
+
+                TranslationSection::make(self::TRANSLATABLE, 'Textos de la web en inglés (English)', fn (string $name) => $name . '_en')
+                    ->description('Se muestran cuando el visitante elige English. Si un campo queda vacío se usa el texto en español (o su traducción por defecto).'),
+
                 Section::make('Moneda')
                     ->schema([
                         Select::make('site_default_currency')
@@ -196,7 +237,9 @@ class SiteSettings extends Page
 
     public function save(): void
     {
-        $data = collect($this->form->getState())->only(self::KEYS)->map(fn ($value) => $value ?? '');
+        $state = $this->form->getState();
+        $data = collect($state)->only(self::KEYS)->map(fn ($value) => $value ?? '');
+        $data->put('site_locales', implode(',', array_unique([Lang::DEFAULT, ...array_intersect(array_keys(Lang::SUPPORTED), (array) ($state['site_locales'] ?? []))])));
 
         Setting::put($data->all());
 
