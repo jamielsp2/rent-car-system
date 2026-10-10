@@ -8,9 +8,9 @@ return [
     // Clave pública de tu plataforma de licencias (Ajustes → Clave pública).
     'public_key' => 'L5QvkQKZI8ihnbKKfmHWbIsrDUb5qaRslSLF11hJ6d0=',
 
-    // Días que el sistema sigue funcionando tras el vencimiento, para dar tiempo a renovar.
+    // Días tras el vencimiento en que el aviso del panel es amarillo (después, rojo). El sistema nunca se bloquea.
     'grace_days' => 3,
 
-    // Cada cuántas horas consulta a la plataforma (renovaciones y revocaciones).
-    'check_hours' => 12,
+    // Cada cuántos minutos consulta a la plataforma (renovaciones y revocaciones), siempre después de enviar la respuesta.
+    'check_minutes' => 30,
 ];

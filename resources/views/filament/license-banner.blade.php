@@ -1,11 +1,11 @@
-@php($license = \App\Support\License::current())
-@if ($license['state'] === 'grace' || ($license['state'] === 'active' && $license['days_left'] <= 7))
-    <div class="mb-4 rounded-xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950 dark:text-amber-100 dark:ring-amber-800" role="alert">
-        @if ($license['state'] === 'grace')
-            Tu licencia venció el {{ date('d/m/Y', $license['expires_at']) }}. El sistema se detendrá el {{ date('d/m/Y', $license['grace_ends_at']) }} si no se renueva.
-        @else
-            Tu licencia vence en {{ max($license['days_left'], 0) }} {{ $license['days_left'] === 1 ? 'día' : 'días' }} ({{ date('d/m/Y', $license['expires_at']) }}).
-        @endif
-        <a href="{{ route('license.show') }}" class="font-bold underline">Ver licencia</a>
+@php($notice = \App\Support\License::notice())
+@if ($notice)
+    <div @class([
+        'mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-semibold ring-1',
+        'bg-red-50 text-red-900 ring-red-300 dark:bg-red-950 dark:text-red-100 dark:ring-red-800' => $notice['level'] === 'danger',
+        'bg-amber-50 text-amber-900 ring-amber-200 dark:bg-amber-950 dark:text-amber-100 dark:ring-amber-800' => $notice['level'] === 'warning',
+    ]) role="alert">
+        <span>{{ $notice['message'] }}</span>
+        <a href="{{ route('license.show') }}" class="shrink-0 rounded-lg bg-black/80 px-3 py-1.5 text-white no-underline hover:bg-black dark:bg-white/90 dark:text-black">Activar licencia</a>
     </div>
 @endif

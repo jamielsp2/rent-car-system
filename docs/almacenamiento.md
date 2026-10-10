@@ -44,7 +44,7 @@ php artisan media:to-r2 --delete   # sube y borra el local
 ```
 
 ## Rotar la credencial de un cliente
-En la ficha de la licencia → *Renovar credencial*. La nueva llega al cliente en su próxima consulta (máx. 12 h) y la anterior sigue valiendo hasta la siguiente rotación, para no dejarlo sin archivos entre medias.
+En la ficha de la licencia → *Renovar credencial*. La nueva llega al cliente en su próxima consulta (máx. 30 min) y la anterior sigue valiendo hasta la siguiente rotación, para no dejarlo sin archivos entre medias.
 
 ## Qué pasa al borrar o revocar una licencia
-Los datos **no se borran**. Revocar una licencia detiene el sistema y la API de credenciales responde «denegado» (con 7 días de gracia tras el vencimiento), pero el bucket y sus archivos se conservan en Cloudflare. Bórralo a mano en Cloudflare si el cliente se da de baja.
+Los datos **no se borran** ni se corta el acceso: el sistema del cliente sigue funcionando con las credenciales que ya tiene (solo ve el aviso «tenant no activado»). La plataforma deja de entregar credenciales nuevas a una licencia revocada o vencida (con 7 días de gracia). El bucket y sus archivos se conservan en Cloudflare; si el cliente se da de baja, bórralo a mano en Cloudflare y revoca su credencial.

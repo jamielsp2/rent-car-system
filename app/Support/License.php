@@ -260,16 +260,43 @@ class License
         return true;
     }
 
-    /** Consulta a la plataforma si toca (cada `check_hours`, o cada 10 min si la licencia no está vigente). */
-    public static function checkOnlineIfDue(): void
+    /** ¿Toca consultar a la plataforma? Cada `check_minutes`; cada 2 minutos mientras la licencia no esté vigente (para recoger una activación o renovación). */
+    public static function isCheckDue(): bool
     {
-        $state = self::state();
-        $valid = self::allows();
-        $interval = $valid ? (int) config('license.check_hours', 12) * 3600 : 600;
-
-        if (self::storedCode() !== null && time() - (int) ($state['checked_at'] ?? 0) >= $interval) {
-            self::checkOnline();
+        if (self::storedCode() === null) {
+            return false;
         }
+
+        $interval = (self::allows() ? max((int) config('license.check_minutes', 30), 1) : 2) * 60;
+
+        return time() - (int) (self::state()['checked_at'] ?? 0) >= $interval;
+    }
+
+    /** Anota que se va a consultar, para que peticiones simultáneas no repitan la consulta. */
+    public static function markChecked(): void
+    {
+        self::saveState(['checked_at' => time()] + self::state());
+    }
+
+    /**
+     * Qué debe mostrar el aviso del panel: null si todo está en orden.
+     *
+     * @return array{level: string, message: string}|null
+     */
+    public static function notice(): ?array
+    {
+        $license = self::current();
+        $date = fn (int $ts) => date('d/m/Y', $ts);
+
+        return match (true) {
+            in_array($license['state'], [self::MISSING, self::INVALID], true) => ['level' => 'danger', 'message' => 'Este tenant no está activado. Activa tu licencia para dejar de ver este aviso.'],
+            $license['state'] === self::REVOKED => ['level' => 'danger', 'message' => 'La licencia de este tenant fue suspendida o ya no existe. Debes activarla de nuevo.'],
+            $license['state'] === self::WRONG_DOMAIN => ['level' => 'danger', 'message' => 'Esta licencia es de otro dominio: este tenant no está activado. Activa la licencia correcta.'],
+            $license['state'] === self::EXPIRED => ['level' => 'danger', 'message' => 'La licencia de este tenant venció el ' . $date($license['expires_at']) . '. Debes renovarla y activarla.'],
+            $license['state'] === self::GRACE => ['level' => 'warning', 'message' => 'La licencia venció el ' . $date($license['expires_at']) . '. Renuévala y actívala para quitar este aviso.'],
+            $license['state'] === self::ACTIVE && $license['days_left'] <= 7 => ['level' => 'warning', 'message' => 'La licencia vence en ' . max($license['days_left'], 0) . ' ' . ($license['days_left'] === 1 ? 'día' : 'días') . ' (' . $date($license['expires_at']) . ').'],
+            default => null,
+        };
     }
 
     // ---- almacenamiento: archivos en storage/app (no dependen de la base de datos) ----

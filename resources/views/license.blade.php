@@ -3,13 +3,13 @@
     $info = $license['license'];
     $valid = in_array($state, ['active', 'grace'], true);
     $messages = [
-        'missing' => ['Falta la licencia', 'Este sistema todavía no tiene licencia. Pega el código que te entregó tu proveedor para activarlo.'],
-        'invalid' => ['Licencia no válida', 'El código guardado no es válido. Pega de nuevo el código completo.'],
+        'missing' => ['Tenant no activado', 'Este sistema todavía no tiene licencia. Pega el código que te entregó tu proveedor para activarlo.'],
+        'invalid' => ['Tenant no activado', 'El código guardado no es válido. Pega de nuevo el código completo.'],
         'active' => ['Licencia activa', 'Tu sistema está activo.'],
-        'grace' => ['Licencia vencida (periodo de gracia)', 'Tu licencia venció, pero el sistema sigue funcionando hasta el ' . date('d/m/Y', $license['grace_ends_at']) . '. Renueva con tu proveedor.'],
+        'grace' => ['Licencia vencida', 'Tu licencia venció el ' . date('d/m/Y', $license['expires_at']) . '. Renueva con tu proveedor y pega aquí el código nuevo.'],
         'expired' => ['Licencia vencida', 'Tu licencia venció el ' . date('d/m/Y', $license['expires_at']) . '. Renueva con tu proveedor: si ya pagaste, pulsa «Comprobar ahora» o pega el código renovado.'],
-        'revoked' => ['Licencia suspendida', 'Esta licencia fue suspendida. Contacta a tu proveedor.'],
-        'wrong_domain' => ['Licencia de otro dominio', 'Esta licencia fue emitida para ' . ($info['domain'] ?? '') . ' y no es válida en este sitio.'],
+        'revoked' => ['Tenant no activado', 'La licencia fue suspendida o ya no existe. Contacta a tu proveedor y pega aquí el código nuevo.'],
+        'wrong_domain' => ['Tenant no activado', 'Esta licencia fue emitida para ' . ($info['domain'] ?? '') . ' y no es válida en este sitio.'],
     ];
     [$title, $text] = $messages[$state] ?? $messages['invalid'];
     $field = 'w-full rounded-xl border border-black/10 bg-white px-3.5 py-3 font-mono text-sm focus:border-brand focus:ring-brand';
@@ -73,9 +73,7 @@
                             <button class="font-semibold text-neutral-600 underline underline-offset-4 hover:text-neutral-900">Comprobar ahora</button>
                         </form>
                     @endif
-                    @if ($valid)
-                        <a href="{{ url('/admin') }}" class="font-semibold text-brand underline underline-offset-4">Ir al panel →</a>
-                    @endif
+                    <a href="{{ url('/admin') }}" class="font-semibold text-brand underline underline-offset-4">Ir al panel →</a>
                 </div>
             </div>
         </div>
