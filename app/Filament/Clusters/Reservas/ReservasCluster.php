@@ -12,6 +12,10 @@ use Filament\Support\Icons\Heroicon;
  */
 class ReservasCluster extends Cluster
 {
+    use \App\Filament\Concerns\RestrictedByRole;
+
+    protected static string $module = 'reservas';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
     protected static ?string $navigationLabel = 'Reservas';

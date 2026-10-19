@@ -21,6 +21,10 @@ use Illuminate\Database\Eloquent\Builder;
 
 class CarResource extends Resource
 {
+    use \App\Filament\Concerns\RestrictedByRole;
+
+    protected static string $module = 'vehiculos';
+
     protected static ?string $model = Car::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTruck;

@@ -32,6 +32,10 @@ use UnitEnum;
  */
 class SiteSettings extends Page
 {
+    use \App\Filament\Concerns\RestrictedByRole;
+
+    protected static string $module = 'configuracion';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGlobeAlt;
 
     protected static string|UnitEnum|null $navigationGroup = 'Configuración';

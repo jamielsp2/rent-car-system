@@ -20,6 +20,10 @@ use UnitEnum;
 
 class CarTypeResource extends Resource
 {
+    use \App\Filament\Concerns\RestrictedByRole;
+
+    protected static string $module = 'catalogos';
+
     protected static ?string $model = CarType::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquares2x2;

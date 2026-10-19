@@ -22,6 +22,10 @@ use Illuminate\Validation\ValidationException;
  */
 class TodayHandovers extends Page
 {
+    use \App\Filament\Concerns\RestrictedByRole;
+
+    protected static string $module = 'reservas';
+
     protected static ?string $cluster = ReservasCluster::class;
 
     protected static ?string $slug = 'hoy';

@@ -26,6 +26,10 @@ use UnitEnum;
  */
 class ContractSettings extends Page
 {
+    use \App\Filament\Concerns\RestrictedByRole;
+
+    protected static string $module = 'configuracion';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
     protected static string|UnitEnum|null $navigationGroup = 'Configuración';

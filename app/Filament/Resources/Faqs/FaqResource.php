@@ -22,6 +22,10 @@ use UnitEnum;
 
 class FaqResource extends Resource
 {
+    use \App\Filament\Concerns\RestrictedByRole;
+
+    protected static string $module = 'contenido';
+
     protected static ?string $model = Faq::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQuestionMarkCircle;

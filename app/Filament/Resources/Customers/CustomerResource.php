@@ -18,6 +18,10 @@ use Illuminate\Database\Eloquent\Builder;
 
 class CustomerResource extends Resource
 {
+    use \App\Filament\Concerns\RestrictedByRole;
+
+    protected static string $module = 'clientes';
+
     protected static ?string $model = Customer::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;

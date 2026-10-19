@@ -23,6 +23,10 @@ use UnitEnum;
  */
 class PaymentSettings extends Page
 {
+    use \App\Filament\Concerns\RestrictedByRole;
+
+    protected static string $module = 'configuracion';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCreditCard;
 
     protected static string|UnitEnum|null $navigationGroup = 'Configuración';

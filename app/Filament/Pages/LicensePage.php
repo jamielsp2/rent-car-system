@@ -25,6 +25,10 @@ use UnitEnum;
  */
 class LicensePage extends Page
 {
+    use \App\Filament\Concerns\RestrictedByRole;
+
+    protected static string $module = 'configuracion';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedKey;
 
     protected static string|UnitEnum|null $navigationGroup = 'Configuración';

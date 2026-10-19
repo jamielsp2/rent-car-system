@@ -22,6 +22,10 @@ use UnitEnum;
 
 class TestimonialResource extends Resource
 {
+    use \App\Filament\Concerns\RestrictedByRole;
+
+    protected static string $module = 'contenido';
+
     protected static ?string $model = Testimonial::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChatBubbleLeftRight;

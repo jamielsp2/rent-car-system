@@ -7,22 +7,26 @@ use App\Models\User;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
 
-/**
- * Staff who can sign in to the admin panel. Everyone has full access.
- */
 class UserResource extends Resource
 {
+    use \App\Filament\Concerns\RestrictedByRole;
+
+    protected static string $module = 'usuarios';
+
     protected static ?string $model = User::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
     protected static string|UnitEnum|null $navigationGroup = 'Configuración';
 
@@ -30,7 +34,7 @@ class UserResource extends Resource
 
     protected static ?string $pluralModelLabel = 'usuarios';
 
-    protected static ?int $navigationSort = 80;
+    protected static ?int $navigationSort = 90;
 
     public static function form(Schema $schema): Schema
     {
@@ -39,38 +43,34 @@ class UserResource extends Resource
             ->components([
                 TextInput::make('first_name')->label('Nombre')->required()->maxLength(120),
                 TextInput::make('last_name')->label('Apellido')->maxLength(120),
-                TextInput::make('email')->label('Correo')->email()->required()->maxLength(191)->unique(ignoreRecord: true),
-                TextInput::make('phone')->label('Teléfono')->tel()->maxLength(20),
-                TextInput::make('password')
-                    ->label('Contraseña')
-                    ->password()
-                    ->revealable()
-                    ->required(fn (?User $record) => ! $record)
-                    ->minLength(8)
+                TextInput::make('email')->label('Correo')->email()->required()->unique(ignoreRecord: true)->maxLength(255),
+                TextInput::make('username')->label('Usuario')->unique(ignoreRecord: true)->maxLength(60),
+                TextInput::make('phone')->label('Teléfono')->tel()->maxLength(30),
+                TextInput::make('password')->label('Contraseña')->password()->revealable()
+                    ->required(fn (string $operation) => $operation === 'create')
                     ->dehydrated(fn (?string $state) => filled($state))
-                    ->helperText(fn (?User $record) => $record ? 'Déjala vacía para conservar la actual.' : 'Mínimo 8 caracteres.')
-                    ->columnSpanFull(),
+                    ->minLength(8)
+                    ->helperText('Al editar, déjala vacía para conservar la actual.'),
+                Toggle::make('super_user')->label('Super administrador')->default(false),
+                Select::make('role_id')->label('Rol')->relationship('role', 'name')->placeholder('Sin rol (acceso completo)')->helperText('Limita los módulos que ve este usuario. Se ignora si es super administrador.'),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->defaultSort('id')
             ->columns([
-                TextColumn::make('first_name')
-                    ->label('Usuario')
-                    ->weight('bold')
-                    ->state(fn (User $record) => $record->getFilamentName())
-                    ->description(fn (User $record) => $record->email)
-                    ->searchable(['first_name', 'last_name', 'email']),
-                TextColumn::make('phone')->label('Teléfono')->placeholder('—'),
-                TextColumn::make('last_login')->label('Último acceso')->dateTime('d/m/Y h:i A')->placeholder('—'),
+                TextColumn::make('first_name')->label('Nombre')->weight('bold')->searchable()
+                    ->formatStateUsing(fn ($state, User $record) => $record->getFilamentName()),
+                TextColumn::make('email')->label('Correo')->searchable(),
+                TextColumn::make('phone')->label('Teléfono'),
+                IconColumn::make('super_user')->label('Super admin')->boolean(),
+                TextColumn::make('role.name')->label('Rol')->badge()->placeholder('Acceso completo'),
+                TextColumn::make('last_login')->label('Último acceso')->dateTime('d/m/Y H:i')->placeholder('—'),
             ])
             ->recordActions([
                 EditAction::make(),
-                // You can't delete yourself, and the last account can't go.
-                DeleteAction::make()->hidden(fn (User $record) => $record->is(auth()->user()) || User::query()->count() <= 1),
+                DeleteAction::make()->hidden(fn (User $record) => $record->is(auth()->user())),
             ]);
     }
 

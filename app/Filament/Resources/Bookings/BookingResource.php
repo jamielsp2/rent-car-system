@@ -17,6 +17,10 @@ use Illuminate\Database\Eloquent\Builder;
 
 class BookingResource extends Resource
 {
+    use \App\Filament\Concerns\RestrictedByRole;
+
+    protected static string $module = 'reservas';
+
     protected static ?string $model = Booking::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedListBullet;

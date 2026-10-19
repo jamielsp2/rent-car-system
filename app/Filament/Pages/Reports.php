@@ -23,6 +23,10 @@ use Filament\Support\Icons\Heroicon;
  */
 class Reports extends Dashboard
 {
+    use \App\Filament\Concerns\RestrictedByRole;
+
+    protected static string $module = 'reportes';
+
     use FiltersByPeriod;
 
     protected static ?string $title = 'Informes';

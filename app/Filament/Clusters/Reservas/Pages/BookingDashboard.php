@@ -18,6 +18,10 @@ use Filament\Support\Icons\Heroicon;
  */
 class BookingDashboard extends Dashboard
 {
+    use \App\Filament\Concerns\RestrictedByRole;
+
+    protected static string $module = 'reservas';
+
     use FiltersByPeriod;
 
     protected static ?string $cluster = ReservasCluster::class;
