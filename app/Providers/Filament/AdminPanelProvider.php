@@ -51,6 +51,8 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->renderHook(PanelsRenderHook::CONTENT_START, fn () => view('filament.license-banner'))
             ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_BEFORE, fn () => view('filament.topbar.site-link'))
+            ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_BEFORE, fn () => view('filament.tour.button'))
+            ->renderHook(PanelsRenderHook::BODY_END, fn () => view('filament.tour.script'))
             ->renderHook(PanelsRenderHook::SIMPLE_LAYOUT_START, fn () => view('filament.auth.login-showcase'), scopes: Login::class)
             ->middleware([
                 EnsureInstalled::class,

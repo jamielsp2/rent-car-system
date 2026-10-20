@@ -67,6 +67,15 @@
     "src": "resources/js/admin-booking-calendar.js",
     "isEntry": true
   },
+  "resources/js/admin-tour.js": {
+    "file": "assets/admin-tour-DxTRNi00.js",
+    "name": "admin-tour",
+    "src": "resources/js/admin-tour.js",
+    "isEntry": true,
+    "css": [
+      "assets/admin-tour-CWXCubYt.css"
+    ]
+  },
   "resources/js/app.js": {
     "file": "assets/app-BvRk9kiK.js",
     "name": "app",
