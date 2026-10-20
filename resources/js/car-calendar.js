@@ -19,7 +19,7 @@ if (element) {
     // Texts and calendar language come from the page (data-i18n), Spanish when absent.
     const t = {
         locale: 'es', day: 'día', days: 'días', departure: 'Salida', chooseReturn: 'Ahora elige la devolución.',
-        choose: t.choose, unavailable: 'No disponible',
+        choose: 'Elige la fecha de salida y luego la de devolución.', unavailable: 'No disponible',
         crossed: 'El vehículo no está disponible en parte de esas fechas. Elige otro rango.',
         ...JSON.parse(element.dataset.i18n || '{}'),
     };
