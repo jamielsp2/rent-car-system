@@ -304,3 +304,13 @@
         order: -1;
     }
 }
+
+/* The sidebar still scrolls, but without showing the scrollbar. */
+.fi-sidebar-nav {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.fi-sidebar-nav::-webkit-scrollbar {
+    display: none;
+}
