@@ -6,6 +6,8 @@ use App\Enums\BookingStatus;
 use App\Models\BookingCar;
 use App\Models\Car;
 use App\Support\LocalTime;
+use Carbon\CarbonInterface;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Collection;
 
 /**
@@ -54,6 +56,34 @@ class AllyStats
             ->whereDate('rental_end_date', '>=', LocalTime::today()->toDateString())
             ->orderBy('rental_start_date')
             ->first();
+    }
+
+    /**
+     * Rental income of the owner's cars per day, for the sparklines.
+     *
+     * @return float[]
+     */
+    public function dailyIncome(int $ownerId, CarbonInterface $from, CarbonInterface $to): array
+    {
+        $days = [];
+        foreach (CarbonPeriod::create($from->copy()->startOfDay(), '1 day', $to->copy()->startOfDay()) as $day) {
+            $days[$day->format('Y-m-d')] = 0.0;
+        }
+
+        BookingCar::query()
+            ->whereHas('car', fn ($q) => $q->ownedBy($ownerId))
+            ->whereHas('booking', fn ($q) => $q->where('status', '!=', BookingStatus::Cancelled))
+            ->whereBetween('rental_start_date', [$from, $to])
+            ->get(['rental_start_date', 'price'])
+            ->each(function (BookingCar $rental) use (&$days): void {
+                $key = $rental->rental_start_date->format('Y-m-d');
+
+                if (array_key_exists($key, $days)) {
+                    $days[$key] += (float) $rental->price;
+                }
+            });
+
+        return array_values($days);
     }
 
     /**

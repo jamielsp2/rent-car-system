@@ -6,80 +6,70 @@ use App\Filament\Widgets\Reports\Concerns\UsesReportPeriod;
 use App\Models\Car;
 use App\Services\AllyStats;
 use App\Support\Money;
-use Filament\Actions\Action;
-use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Table;
-use Filament\Widgets\TableWidget;
+use Filament\Widgets\Widget;
 
 /**
- * One row per car of the ally: price, minimum stay, availability, renter and profit.
+ * The ally's vehicles, ranked by profit, styled like the admin's fleet ranking.
+ * Each car opens its own booking history.
  */
-class AllyFleet extends TableWidget
+class AllyFleet extends Widget
 {
     use UsesReportPeriod;
 
-    protected static ?string $heading = 'Vehículos';
+    protected string $view = 'filament.ally.fleet';
 
     protected int|string|array $columnSpan = 'full';
 
-    public function table(Table $table): Table
+    protected function getViewData(): array
     {
         [$from, $to] = $this->period();
         $ownerId = auth()->id();
+
         $stats = $this->report()->fleet($from, $to, $ownerId)
             ->keyBy(fn (array $row) => $row['car']->getKey());
+        $maxIncome = max(1, (float) $stats->max('income'));
         $allies = app(AllyStats::class);
 
-        return $table
-            ->query(fn () => Car::query()->ownedBy($ownerId)->with('make')->orderBy('name'))
-            ->paginated(false)
-            ->columns([
-                TextColumn::make('name')->label('Vehículo')->weight('bold')->searchable()
-                    ->description(fn (Car $record) => $record->license_plate ?: null),
-                TextColumn::make('rental_rate')->label('Precio por día')->alignEnd()
-                    ->formatStateUsing(fn ($state) => Money::format($state)),
-                TextColumn::make('min_rental_days')->label('Renta mínima')->suffix(' días')->alignCenter(),
-                TextColumn::make('availability')->label('Situación')
-                    ->state(fn (Car $record) => $allies->status($record)['label'])
-                    ->badge()
-                    ->color(fn (Car $record) => $allies->status($record)['color']),
-                TextColumn::make('renter')->label('Quién la rentó / próxima renta')
-                    ->state(fn (Car $record) => $allies->status($record)['rental']?->booking?->customer_name ?? '—')
-                    ->description(function (Car $record) use ($allies) {
-                        $rental = $allies->status($record)['rental'];
+        $rows = Car::query()->ownedBy($ownerId)->with('make')->orderBy('name')->get()
+            ->map(function (Car $car) use ($stats, $allies, $maxIncome): array {
+                $status = $allies->status($car);
+                $rental = $status['rental'];
+                $row = $stats[$car->getKey()] ?? null;
 
-                        return $rental
-                            ? $rental->rental_start_date->format('d/m/Y') . ' → ' . $rental->rental_end_date->format('d/m/Y')
-                            : null;
-                    }),
-                TextColumn::make('income')->label('Ingresos')->alignEnd()->toggleable()
-                    ->state(fn (Car $record) => $stats[$record->getKey()]['income'] ?? 0)
-                    ->formatStateUsing(fn ($state) => Money::format($state)),
-                TextColumn::make('expenses')->label('Gastos')->alignEnd()->toggleable()
-                    ->state(fn (Car $record) => $stats[$record->getKey()]['expenses'] ?? 0)
-                    ->formatStateUsing(fn ($state) => Money::format($state)),
-                TextColumn::make('profit')->label('Rentabilidad')->alignEnd()->weight('bold')
-                    ->state(fn (Car $record) => $stats[$record->getKey()]['profit'] ?? 0)
-                    ->formatStateUsing(fn ($state) => Money::format($state))
-                    ->color(fn ($state) => $state >= 0 ? 'success' : 'danger'),
-                TextColumn::make('utilization')->label('Ocupación')->alignCenter()->toggleable()
-                    ->state(fn (Car $record) => round($stats[$record->getKey()]['utilization'] ?? 0))
-                    ->suffix('%'),
-                TextColumn::make('rentals')->label('Rentas')->alignCenter()->toggleable()
-                    ->state(fn (Car $record) => $stats[$record->getKey()]['rentals'] ?? 0),
-            ])
-            ->recordActions([
-                Action::make('history')
-                    ->label('Historial')
-                    ->icon(Heroicon::OutlinedClock)
-                    ->color('gray')
-                    ->modalHeading(fn (Car $record) => 'Historial de ' . $record->name)
-                    ->modalContent(fn (Car $record) => view('filament.ally.car-history', [
-                        'rentals' => $allies->history($record),
-                    ]))
-                    ->modalSubmitAction(false)
-                    ->modalCancelActionLabel('Cerrar'),
-            ]);
+                return [
+                    'name' => $car->name,
+                    'meta' => collect([$car->make?->name, $car->license_plate])->filter()->implode(' · '),
+                    'image' => $car->cover_url,
+                    'price' => Money::format($car->rental_rate),
+                    'min_days' => (int) $car->min_rental_days,
+                    'status' => $status['label'],
+                    'status_color' => $status['color'],
+                    'renter' => $rental?->booking?->customer_name,
+                    'dates' => $rental ? $rental->rental_start_date->format('d/m/Y') . ' → ' . $rental->rental_end_date->format('d/m/Y') : null,
+                    'income' => Money::format($row['income'] ?? 0),
+                    'income_value' => (float) ($row['income'] ?? 0),
+                    'income_share' => (float) ($row['income'] ?? 0) / $maxIncome * 100,
+                    'expenses' => ($row['expenses'] ?? 0) ? Money::format($row['expenses']) : '—',
+                    'profit' => Money::format($row['profit'] ?? 0),
+                    'profit_value' => (float) ($row['profit'] ?? 0),
+                    'utilization' => round($row['utilization'] ?? 0),
+                    'rentals' => $row['rentals'] ?? 0,
+                    'history' => $allies->history($car)->take(20)->map(fn ($r) => [
+                        'booking' => $r->booking?->booking_number,
+                        'customer' => $r->booking?->customer_name,
+                        'from' => $r->rental_start_date->format('d/m/Y H:i'),
+                        'to' => $r->rental_end_date->format('d/m/Y H:i'),
+                        'price' => Money::format($r->price),
+                        'status' => $r->booking?->status?->getLabel(),
+                    ])->all(),
+                ];
+            })
+            ->sortByDesc('profit_value')
+            ->values();
+
+        return [
+            'rows' => $rows,
+            'total' => Money::format($stats->sum('profit')),
+        ];
     }
 }

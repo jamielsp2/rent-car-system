@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Ally\Auth\Login;
 use App\Http\Middleware\EnsureInstalled;
 use App\Http\Middleware\EnsureLicensed;
 use App\Support\SiteContent;
@@ -13,6 +14,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -22,6 +24,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 /**
  * Panel for allies (/aliados): they see only their own cars and their reports.
+ * Same look as the admin panel (theme, sign-in showcase), with its own wording.
  */
 class AllyPanelProvider extends PanelProvider
 {
@@ -30,7 +33,8 @@ class AllyPanelProvider extends PanelProvider
         return $panel
             ->id('aliados')
             ->path('aliados')
-            ->login()
+            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->login(Login::class)
             ->brandName(fn () => SiteContent::name())
             ->brandLogo(fn () => SiteContent::logo())
             ->brandLogoHeight('2.25rem')
@@ -40,9 +44,21 @@ class AllyPanelProvider extends PanelProvider
             ])
             ->font('Inter')
             ->darkMode(false)
+            ->sidebarCollapsibleOnDesktop()
             ->maxContentWidth(Width::Full)
+            ->sidebarWidth('15rem')
             ->discoverPages(in: app_path('Filament/Ally/Pages'), for: 'App\Filament\Ally\Pages')
             ->discoverWidgets(in: app_path('Filament/Ally/Widgets'), for: 'App\Filament\Ally\Widgets')
+            ->renderHook(PanelsRenderHook::SIMPLE_LAYOUT_START, fn () => view('filament.auth.login-showcase', [
+                'panelName' => 'Panel de aliados',
+                'headline' => 'Tus vehículos rentados,',
+                'highlight' => 'siempre a la vista.',
+                'features' => [
+                    ['icon' => 'heroicon-o-truck', 'title' => 'Tus vehículos', 'text' => 'Todos los autos que prestas, en un solo lugar.'],
+                    ['icon' => 'heroicon-o-presentation-chart-line', 'title' => 'Rentabilidad clara', 'text' => 'Ingresos, gastos y utilidad de cada vehículo.'],
+                    ['icon' => 'heroicon-o-calendar-days', 'title' => 'Renta al día', 'text' => 'Si está rentado, reservado o libre, y quién lo rentó.'],
+                ],
+            ]), scopes: Login::class)
             ->middleware([
                 EnsureInstalled::class,
                 EnsureLicensed::class,
