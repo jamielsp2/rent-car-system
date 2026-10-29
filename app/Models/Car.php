@@ -48,6 +48,7 @@ class Car extends Model
         'vehicle_type_id',
         'transmission_id',
         'fuel_type_id',
+        'owner_id',
     ];
 
     protected static function booted(): void
@@ -122,6 +123,17 @@ class Car extends Model
     public function type(): BelongsTo
     {
         return $this->belongsTo(CarType::class, 'vehicle_type_id');
+    }
+
+    /** The ally who lends the car; null for the rent-a-car's own fleet. */
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function scopeOwnedBy(Builder $query, int $userId): void
+    {
+        $query->where('owner_id', $userId);
     }
 
     public function slug(): HasOne

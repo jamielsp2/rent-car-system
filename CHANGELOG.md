@@ -2,6 +2,8 @@
 
 ## Sin publicar
 
+- Aliados: dueños de vehículos que la empresa renta. Módulo *Aliados* para crearlos y asignarles vehículos (también desde el toggle *Vehículo aliado* del vehículo). Panel propio en `/aliados` con rentabilidad general y por vehículo, precio, renta mínima, si está rentado o reservado, quién lo rentó e historial de reservas.
+- Administradores (personal) pueden crear reservas y clientes desde el panel.
 - Web pública en español e inglés: español en la raíz e inglés en `/en`, selector ES | EN que lleva a la misma página, idiomas activables desde *Web pública*.
 - Contenido traducible (vehículos, blog, preguntas, servicios, testimonios, catálogos, textos de la web) con sección *English* en el panel, **Traducir desde español** y **Generar con IA** bilingüe (Groq).
 - SEO por idioma: título y descripción para Google, canonical, `hreflang`, Open Graph, datos estructurados (AutoRental, Car/Offer, FAQPage, BlogPosting, BreadcrumbList), `sitemap`, `robots.txt` y `noindex` donde corresponde.

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Cars\Schemas;
 
 use App\Enums\CarStatus;
 use App\Models\Car;
+use App\Models\User;
 use App\Filament\Support\SeoSection;
 use App\Filament\Support\TranslationSection;
 use App\Services\CarCopywriter;
@@ -157,6 +158,29 @@ class CarForm
                 ])->columnSpan(['default' => 3, 'lg' => 2]),
 
                 Group::make([
+                    Section::make('Aliado')
+                        ->schema([
+                            // Only a switch on the form: the owner is stored in owner_id.
+                            Toggle::make('is_ally_car')
+                                ->label('Vehículo aliado')
+                                ->helperText('Un aliado presta este vehículo para que la empresa lo rente.')
+                                ->dehydrated(false)
+                                ->live()
+                                ->afterStateHydrated(fn (Toggle $component, ?Car $record) => $component->state(filled($record?->owner_id)))
+                                ->afterStateUpdated(function (bool $state, Set $set): void {
+                                    if (! $state) {
+                                        $set('owner_id', null);
+                                    }
+                                }),
+                            Select::make('owner_id')
+                                ->label('Aliado dueño')
+                                ->options(fn () => User::query()->where('is_ally', true)->orderBy('first_name')->get()
+                                    ->mapWithKeys(fn (User $ally) => [$ally->getKey() => $ally->getFilamentName()]))
+                                ->searchable()
+                                ->required()
+                                ->visible(fn (Get $get) => (bool) $get('is_ally_car'))
+                                ->helperText('Si no aparece, créalo en el módulo Aliados.'),
+                        ]),
                     Section::make('Renta')
                         ->schema([
                             Select::make('status')

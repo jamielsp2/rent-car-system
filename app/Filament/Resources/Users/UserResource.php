@@ -16,6 +16,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 class UserResource extends Resource
@@ -35,6 +36,12 @@ class UserResource extends Resource
     protected static ?string $pluralModelLabel = 'usuarios';
 
     protected static ?int $navigationSort = 90;
+
+    /** Allies are managed in the Aliados module, not here. */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->where('is_ally', false);
+    }
 
     public static function form(Schema $schema): Schema
     {

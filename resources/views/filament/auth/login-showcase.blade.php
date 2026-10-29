@@ -2,7 +2,11 @@
     $image = \App\Support\SiteContent::hero()['image'];
     $logo = \App\Support\SiteContent::logo();
     $siteName = \App\Support\SiteContent::name();
-    $features = [
+    // Each panel (admin, aliados) passes its own wording; the admin defaults apply otherwise.
+    $panelName ??= 'Panel de gestión';
+    $headline ??= 'Tu flota, tus reservas y tu negocio';
+    $highlight ??= 'en un solo lugar.';
+    $features ??= [
         ['icon' => 'heroicon-o-calendar-days', 'title' => 'Reservas al día', 'text' => 'Confirma, entrega y recibe desde un solo lugar.'],
         ['icon' => 'heroicon-o-document-check', 'title' => 'Contratos digitales', 'text' => 'Firma en tableta, con fotos y daños marcados.'],
         ['icon' => 'heroicon-o-presentation-chart-line', 'title' => 'Informes del negocio', 'text' => 'Ingresos, utilidad y ocupación de cada vehículo.'],
@@ -25,7 +29,7 @@
         @endif
         <div class="leading-tight">
             <p class="text-lg font-bold">{{ $siteName }}</p>
-            <p class="text-xs tracking-[0.2em] text-white/60 uppercase">Panel de gestión</p>
+            <p class="text-xs tracking-[0.2em] text-white/60 uppercase">{{ $panelName }}</p>
         </div>
     </div>
 
@@ -34,7 +38,7 @@
             <span class="size-1.5 animate-pulse rounded-full bg-emerald-400"></span> Panel en línea
         </span>
         <h1 class="mt-5 max-w-xl text-4xl leading-tight font-extrabold tracking-tight xl:text-5xl">
-            Tu flota, tus reservas y tu negocio <span class="bg-gradient-to-r from-white to-sky-300 bg-clip-text text-transparent">en un solo lugar.</span>
+            {{ $headline }} <span class="bg-gradient-to-r from-white to-sky-300 bg-clip-text text-transparent">{{ $highlight }}</span>
         </h1>
 
         <ul class="mt-10 grid max-w-xl gap-3">

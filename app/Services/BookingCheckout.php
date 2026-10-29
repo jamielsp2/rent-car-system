@@ -33,8 +33,9 @@ class BookingCheckout
     /**
      * @param  array{name: string, email: string, phone: string, note?: ?string}  $customer
      * @param  int[]  $serviceIds
+     * @param  ?Customer  $account  Set by the admin panel; the website finds the account by email.
      */
-    public function book(Car $car, CarbonInterface $from, CarbonInterface $to, array $customer, PaymentMethod $method, array $serviceIds = []): Booking
+    public function book(Car $car, CarbonInterface $from, CarbonInterface $to, array $customer, PaymentMethod $method, array $serviceIds = [], ?Customer $account = null): Booking
     {
         $quote = $this->quotes->quote($car, $from, $to, $serviceIds);
 
@@ -42,7 +43,7 @@ class BookingCheckout
             throw ValidationException::withMessages(['to' => "Este vehículo se renta por un mínimo de {$quote['min_days']} días."]);
         }
 
-        return DB::transaction(function () use ($car, $from, $to, $customer, $method, $quote): Booking {
+        return DB::transaction(function () use ($car, $from, $to, $customer, $method, $quote, $account): Booking {
             // Lock the car row so two people can't take the same dates at once.
             Car::query()->whereKey($car->getKey())->lockForUpdate()->first();
 
@@ -51,7 +52,7 @@ class BookingCheckout
             }
 
             $currency = Currency::default();
-            $account = Customer::query()->where('email', $customer['email'])->first();
+            $account ??= Customer::query()->where('email', $customer['email'])->first();
 
             $booking = new Booking();
             $booking->forceFill([
