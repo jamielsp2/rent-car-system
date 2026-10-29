@@ -28,7 +28,7 @@ class CustomerForm
                         TextInput::make('whatsapp')->label('WhatsApp')->tel()->maxLength(25),
                         DatePicker::make('dob')->label('Fecha de nacimiento'),
                         TextInput::make('address')->label('Dirección')->maxLength(255)->columnSpanFull(),
-                        Select::make('status')->label('Estado de la cuenta')->options(CustomerStatus::class)->required()->live(),
+                        Select::make('status')->label('Estado de la cuenta')->options(CustomerStatus::class)->default(CustomerStatus::Activated)->required()->live(),
                         Textarea::make('block_reason')
                             ->label('Motivo del bloqueo')
                             ->rows(2)

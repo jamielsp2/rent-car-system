@@ -22,6 +22,7 @@ class Role extends Model
         'reportes' => 'Reportes',
         'configuracion' => 'Configuración del sitio, contrato y base de datos',
         'usuarios' => 'Usuarios y roles',
+        'aliados' => 'Aliados (dueños de vehículos y sus vehículos)',
     ];
 
     protected function casts(): array

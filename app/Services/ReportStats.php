@@ -127,14 +127,14 @@ class ReportStats
      *
      * @return Collection<int, array{car: Car, income: float, days: int, rentals: int, utilization: float, expenses: float, profit: float}>
      */
-    public function fleet(CarbonImmutable $from, CarbonImmutable $to): Collection
+    public function fleet(CarbonImmutable $from, CarbonImmutable $to, ?int $ownerId = null): Collection
     {
         $periodDays = static::days($from, $to);
         $rentals = $this->overlapping($from, $to)->get()->groupBy(fn (Booking $b) => $b->rental->car_id);
         $expenses = CarExpense::query()->whereBetween('date', [$from, $to])
             ->selectRaw('car_id, SUM(amount) as total')->groupBy('car_id')->pluck('total', 'car_id');
 
-        return Car::query()->with('make')->orderBy('order')->get()
+        return Car::query()->with('make')->when($ownerId, fn (Builder $q) => $q->ownedBy($ownerId))->orderBy('order')->get()
             ->map(function (Car $car) use ($rentals, $expenses, $from, $to, $periodDays): array {
                 $income = 0.0;
                 $days = 0;

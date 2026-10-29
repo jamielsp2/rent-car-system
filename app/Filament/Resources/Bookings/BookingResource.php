@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Bookings;
 
 use App\Filament\Clusters\Reservas\ReservasCluster;
+use App\Filament\Resources\Bookings\Pages\CreateBooking;
 use App\Filament\Resources\Bookings\Pages\EditBooking;
 use App\Filament\Resources\Bookings\Pages\ListBookings;
 use App\Filament\Resources\Bookings\Schemas\BookingForm;
@@ -56,6 +57,7 @@ class BookingResource extends Resource
     {
         return [
             'index' => ListBookings::route('/'),
+            'create' => CreateBooking::route('/create'),
             'edit' => EditBooking::route('/{record}/edit'),
         ];
     }
