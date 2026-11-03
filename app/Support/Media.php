@@ -27,6 +27,14 @@ class Media
             return $path;
         }
 
-        return Storage::disk('media')->url($path);
+        $url = Storage::disk('media')->url($path);
+
+        // Filament treats a relative URL as a file on its own disk and hides the image when
+        // that file is not there. A full URL is always shown, so make the path absolute.
+        if ($url && str_starts_with($url, '/')) {
+            $url = rtrim(request()->getSchemeAndHttpHost(), '/') . $url;
+        }
+
+        return $url;
     }
 }
