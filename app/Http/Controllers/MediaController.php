@@ -13,6 +13,29 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class MediaController extends Controller
 {
+    /**
+     * Uploads kept on this server (public/media, no R2 bucket). The app serves them itself,
+     * so photos load whatever the web root is (on Hostinger it is often the project folder,
+     * where /media/... does not exist).
+     */
+    public function local(string $path): Response
+    {
+        abort_if(R2::enabled(), 404);
+
+        $path = ltrim(str_replace('\\', '/', $path), '/');
+
+        abort_if($path === '' || str_contains($path, '..') || str_starts_with(basename($path), '.'), 404);
+
+        $disk = Storage::disk('media');
+
+        abort_unless($disk->exists($path), 404);
+
+        return $disk->response($path, null, [
+            'Cache-Control' => 'public, max-age=86400',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
     public function show(Request $request): Response
     {
         $path = ltrim(str_replace('\\', '/', (string) $request->query('f')), '/');

@@ -23,6 +23,10 @@ Route::controller(LicenseController::class)->group(function (): void {
     Route::post('/licencia/comprobar', 'check')->middleware('throttle:10,1')->name('license.check');
 });
 
+// Uploads kept on this server (public/media). Served by the app so the photos load even when
+// the web root is the project folder instead of public/. Only used without an R2 bucket.
+Route::get('/media/{path}', [MediaController::class, 'local'])->where('path', '.+')->name('media.local');
+
 // Files in the client's R2 bucket. No session or cookies: every photo of the site goes through here.
 Route::get('/media-r2', [MediaController::class, 'show'])->name('media.r2')->withoutMiddleware([
     \Illuminate\Session\Middleware\StartSession::class,
