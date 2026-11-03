@@ -48,6 +48,7 @@ class ContractSettings extends Page
             'contract_company_representative' => $settings->companyRepresentative(),
             'contract_min_photos' => $settings->minPhotos(),
             'contract_terms' => $settings->terms(),
+            'contract_terms_en' => $settings->terms('en'),
             'contract_checklist_items' => implode("\n", $settings->checklistItems()),
             'contract_footer_note' => $settings->footerNote(),
         ]);
@@ -86,6 +87,10 @@ class ContractSettings extends Page
                             ->label('Términos y condiciones')
                             ->toolbarButtons(['bold', 'italic', 'underline', 'bulletList', 'orderedList', 'h3', 'undo', 'redo'])
                             ->required(),
+                        RichEditor::make('contract_terms_en')
+                            ->label('Términos y condiciones (inglés)')
+                            ->helperText('Se usa cuando el cliente firma el contrato en inglés. Si lo dejas vacío, se usa la versión por defecto.')
+                            ->toolbarButtons(['bold', 'italic', 'underline', 'bulletList', 'orderedList', 'h3', 'undo', 'redo']),
                         Text::make('Variables disponibles: ' . $variables),
                     ]),
 
@@ -121,6 +126,7 @@ class ContractSettings extends Page
     {
         $data = $this->form->getState();
         $data['contract_terms'] = ContractTerms::clean((string) $data['contract_terms']);
+        $data['contract_terms_en'] = ContractTerms::clean((string) ($data['contract_terms_en'] ?? ''));
 
         Setting::put(collect($data)
             ->mapWithKeys(fn ($value, string $key) => [Settings::PREFIX . $key => $value])

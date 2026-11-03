@@ -55,7 +55,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ lroute('site.checkout.store', $car->slug->key) }}" class="mt-6 grid gap-6 lg:mt-8 lg:grid-cols-[1fr_380px] lg:gap-8">
+        <form method="POST" enctype="multipart/form-data" action="{{ lroute('site.checkout.store', $car->slug->key) }}" class="mt-6 grid gap-6 lg:mt-8 lg:grid-cols-[1fr_380px] lg:gap-8">
             @csrf
             <input type="hidden" name="from" value="{{ $dates['from'] }}">
             <input type="hidden" name="to" value="{{ $dates['to'] }}">
@@ -78,6 +78,26 @@
                         <label class="block">
                             <span class="mb-1 block text-sm font-semibold">{{ __('Teléfono / WhatsApp *') }}</span>
                             <input type="tel" name="phone" value="{{ old('phone') }}" required maxlength="25" autocomplete="tel" inputmode="tel" class="{{ $input }}">
+                        </label>
+                        <label class="block">
+                            <span class="mb-1 block text-sm font-semibold">{{ __('Tipo de documento *') }}</span>
+                            <select name="document_type" required class="{{ $input }}">
+                                @foreach (\App\Enums\DocumentType::cases() as $type)
+                                    <option value="{{ $type->value }}" @selected(old('document_type', 'cedula') === $type->value)>{{ __($type->getLabel()) }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+                        <label class="block">
+                            <span class="mb-1 block text-sm font-semibold">{{ __('Número de documento *') }}</span>
+                            <input name="national_id" value="{{ old('national_id') }}" required maxlength="30" autocomplete="off" class="{{ $input }}">
+                        </label>
+                        <label class="block">
+                            <span class="mb-1 block text-sm font-semibold">{{ __('Foto del documento — frente (opcional)') }}</span>
+                            <input type="file" name="document_front" accept="image/jpeg,image/png,image/webp" class="{{ $input }}">
+                        </label>
+                        <label class="block">
+                            <span class="mb-1 block text-sm font-semibold">{{ __('Foto del documento — reverso (opcional)') }}</span>
+                            <input type="file" name="document_back" accept="image/jpeg,image/png,image/webp" class="{{ $input }}">
                         </label>
                         <label class="block sm:col-span-2">
                             <span class="mb-1 block text-sm font-semibold">{{ __('Hora de entrega y devolución *') }}</span>

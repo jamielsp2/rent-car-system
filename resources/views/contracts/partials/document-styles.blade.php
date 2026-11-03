@@ -53,6 +53,20 @@
         .btn-danger { background: var(--danger); color: #fff; }
         .btn-sm { padding: 4px 10px; font-size: 12px; }
 
+        /* Language selector in the toolbar: same look as the buttons. */
+        .lang-picker { display: inline-flex; align-items: center; gap: 8px; margin: 0; color: #fff; font-size: 14px; font-weight: 600; }
+        .lang-picker select {
+            padding: 8px 14px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            background: #fff;
+            color: var(--ink);
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .lang-picker select:disabled { opacity: .6; cursor: not-allowed; }
+
         .page {
             max-width: 900px;
             margin: 20px auto;

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BookingCalendarController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CustomerDocumentController;
 use App\Http\Controllers\InstallController;
 use App\Http\Controllers\LicenseController;
 use App\Http\Controllers\MediaController;
@@ -60,6 +61,12 @@ Route::get('/sitemap.xml', SitemapController::class)->name('sitemap.xml');
 Route::middleware('locale:es')->group($site);
 Route::prefix('en')->name('en.')->middleware('locale:en')->group($site);
 
+// Identity photos (front/back) of a customer, streamed from the private disk to staff only.
+Route::middleware('auth')
+    ->get('admin/documentos-cliente/{customer}/{side}', [CustomerDocumentController::class, 'show'])
+    ->whereIn('side', ['front', 'back'])
+    ->name('admin.customers.document');
+
 Route::middleware('auth')
     ->get('admin/reservas/calendario/eventos', [BookingCalendarController::class, 'events'])
     ->name('admin.bookings.calendar.events');
@@ -73,6 +80,7 @@ Route::middleware('auth')
     ->group(function (): void {
         Route::get('contract', 'delivery')->name('delivery');
         Route::post('contract', 'saveDelivery')->name('delivery.save');
+        Route::post('contract/language', 'setDeliveryLanguage')->name('delivery.language');
         Route::post('contract/void', 'voidDelivery')->name('delivery.void');
 
         Route::get('return', 'return')->name('return');

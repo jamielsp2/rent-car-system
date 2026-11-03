@@ -48,8 +48,16 @@ class ContractSettings
         return array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $items))));
     }
 
-    public function terms(): string
+    /**
+     * Clauses in the language the contract is written in. The English text has its own
+     * setting (contract_terms_en) and falls back to the built-in translation.
+     */
+    public function terms(string $language = 'es'): string
     {
+        if ($language === 'en') {
+            return $this->get('contract_terms_en') ?: ContractTerms::DEFAULT_EN;
+        }
+
         return $this->get('contract_terms') ?: ContractTerms::DEFAULT;
     }
 

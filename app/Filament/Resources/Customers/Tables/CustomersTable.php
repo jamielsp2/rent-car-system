@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Customers\Tables;
 
 use App\Enums\CustomerStatus;
 use App\Enums\LicenseStatus;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -35,6 +36,12 @@ class CustomersTable
             ->recordActions([
                 ViewAction::make()->iconButton(),
                 EditAction::make()->iconButton(),
+                // Soft delete: the customer is hidden but their bookings and history stay.
+                DeleteAction::make()
+                    ->iconButton()
+                    ->modalHeading('Eliminar cliente')
+                    ->modalDescription('El cliente dejará de aparecer en el listado. Sus reservas se conservan.')
+                    ->successNotificationTitle('Cliente eliminado'),
             ]);
     }
 }

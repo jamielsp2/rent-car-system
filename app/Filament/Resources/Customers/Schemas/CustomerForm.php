@@ -3,14 +3,21 @@
 namespace App\Filament\Resources\Customers\Schemas;
 
 use App\Enums\CustomerStatus;
+use App\Enums\DocumentType;
 use App\Enums\LicenseStatus;
+use App\Models\Customer;
+use App\Services\CustomerMatcher;
+use App\Support\DocumentGallery;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Model;
 
 class CustomerForm
 {
@@ -47,6 +54,33 @@ class CustomerForm
                             ->rows(2)
                             ->columnSpanFull()
                             ->visible(fn (Get $get) => in_array($get('license_status'), [LicenseStatus::Rejected, LicenseStatus::Rejected->value], true)),
+                    ]),
+
+                Section::make('Documento de identidad')
+                    ->columns(2)
+                    ->schema([
+                        Select::make('document_type')->label('Tipo de documento')->options(DocumentType::class)->default(DocumentType::Cedula->value)->selectablePlaceholder(false),
+                        TextInput::make('national_id')->label('Número de documento')->maxLength(30),
+                        FileUpload::make('document_front_path')
+                            ->label('Foto del documento — frente')
+                            ->disk(CustomerMatcher::DOCUMENT_DISK)
+                            ->directory('customer-documents')
+                            ->visibility('private')
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->maxSize(5120),
+                        FileUpload::make('document_back_path')
+                            ->label('Foto del documento — reverso')
+                            ->disk(CustomerMatcher::DOCUMENT_DISK)
+                            ->directory('customer-documents')
+                            ->visibility('private')
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->maxSize(5120),
+                        Placeholder::make('document_photos')
+                            ->label('Ver fotos guardadas')
+                            ->columnSpanFull()
+                            ->content(fn (?Model $record) => $record instanceof Customer
+                                ? (DocumentGallery::for($record) ?? 'Sin fotos guardadas.')
+                                : 'Se pueden subir al guardar el cliente.'),
                     ]),
             ]);
     }

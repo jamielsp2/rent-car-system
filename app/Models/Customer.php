@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CustomerStatus;
+use App\Enums\DocumentType;
 use App\Enums\LicenseStatus;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -20,6 +21,10 @@ class Customer extends Model
         'name',
         'email',
         'phone',
+        'national_id',
+        'document_type',
+        'document_front_path',
+        'document_back_path',
         'whatsapp',
         'address',
         'dob',
@@ -38,6 +43,7 @@ class Customer extends Model
     {
         return [
             'status' => CustomerStatus::class,
+            'document_type' => DocumentType::class,
             'license_status' => LicenseStatus::class,
             'dob' => 'date',
             'confirmed_at' => 'datetime',

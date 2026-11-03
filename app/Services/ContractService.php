@@ -40,6 +40,24 @@ class ContractService
     /**
      * @param  UploadedFile[]  $uploads
      */
+    /**
+     * Language the pickup contract is written and signed in. It is kept on the contract
+     * and can only change while the contract is unsigned.
+     */
+    public function setDeliveryLanguage(Booking $booking, string $language): BookingContract
+    {
+        $contract = $this->contractFor($booking);
+
+        if ($contract->isSigned()) {
+            throw ValidationException::withMessages(['language' => 'El contrato ya está firmado; el idioma ya no se puede cambiar.']);
+        }
+
+        $contract->language = $language;
+        $booking->contract()->save($contract);
+
+        return $contract;
+    }
+
     public function saveDelivery(Booking $booking, array $data, array $uploads, bool $sign): BookingContract
     {
         $contract = $this->contractFor($booking);
@@ -72,7 +90,7 @@ class ContractService
                 'customer_signature' => $data['customer_signature'],
                 'signed_at' => now(),
                 // Freeze the clauses as they read when the customer signed.
-                'terms_snapshot' => $this->terms->render($booking, $data['signer_document'] ?? null),
+                'terms_snapshot' => $this->terms->render($booking, $data['signer_document'] ?? null, $contract->language ?? 'es'),
             ]);
         }
 

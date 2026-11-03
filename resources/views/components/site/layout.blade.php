@@ -131,6 +131,11 @@
             </nav>
 
             <div class="flex items-center gap-3">
+                @if ($social['instagram'])
+                    <a href="{{ $social['instagram'] }}" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram" class="flex items-center rounded-lg p-2 text-neutral-700 transition hover:text-brand">
+                        <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+                    </a>
+                @endif
                 <a href="{{ lroute('site.cars') }}" class="rounded-lg bg-brand px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark">{{ __('Reservar') }}</a>
                 <details class="relative md:hidden">
                     <summary class="flex cursor-pointer list-none items-center rounded-lg border border-black/10 p-2" aria-label="{{ __('Menú') }}"><x-site.icon name="menu" /></summary>

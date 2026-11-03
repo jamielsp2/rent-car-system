@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Customers\Schemas;
 
 use App\Filament\Resources\Bookings\BookingResource;
 use App\Models\Customer;
+use App\Support\DocumentGallery;
 use App\Support\Media;
 use App\Support\Money;
 use Filament\Infolists\Components\ImageEntry;
@@ -45,6 +46,18 @@ class CustomerInfolist
                                 Media::url($record->license_back_image),
                             ])))
                             ->imageHeight(80),
+                    ]),
+
+                Section::make('Documento de identidad')
+                    ->columnSpan(1)
+                    ->schema([
+                        TextEntry::make('document_type')->label('Tipo')->placeholder('—'),
+                        TextEntry::make('national_id')->label('Número')->placeholder('—'),
+                        TextEntry::make('document_photos')
+                            ->hiddenLabel()
+                            ->html()
+                            ->state(fn (Customer $record) => DocumentGallery::for($record))
+                            ->placeholder('Sin fotos'),
                     ]),
 
                 Section::make('Reservas')

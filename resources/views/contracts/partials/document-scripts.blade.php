@@ -87,9 +87,9 @@
                 const list = diagram.querySelector('.damage-list tbody');
                 const input = diagram.querySelector('input.diagram-marks-input');
                 const NS = 'http://www.w3.org/2000/svg';
-                const noteLabel = @js('Detalle (opcional)');
-                const removeLabel = @js('Quitar');
-                const emptyLabel = @js('Sin daños marcados.');
+                const noteLabel = @js(__('Detalle (opcional)'));
+                const removeLabel = @js(__('Quitar'));
+                const emptyLabel = @js(__('Sin daños marcados.'));
                 let marks = [];
 
                 try { marks = JSON.parse(input.value) || []; } catch (e) { marks = []; }
@@ -170,7 +170,7 @@
             // Live photo counter (kept photos + newly selected files)
             const photoCount = document.getElementById('photo-count');
             const photoInput = document.querySelector('input[name="{{ $photoInputName }}"]');
-            const photoLabel = @js(':current de :count');
+            const photoLabel = @js(__(':current de :count'));
 
             function countPhotos() {
                 const kept = document.querySelectorAll('input[name="existing_images[]"]:checked').length;
@@ -214,7 +214,7 @@
 
                 if (Object.keys(pads).some(function (name) { return pads[name].empty; })) {
                     e.preventDefault();
-                    alert(@js('Se requieren la firma del arrendatario y la de la arrendadora.'));
+                    alert(@js(__('Se requieren la firma del arrendatario y la de la arrendadora.')));
                 }
             });
         })();

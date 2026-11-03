@@ -8,10 +8,14 @@ use App\Enums\VehicleCondition;
 use App\Http\Requests\DeliveryContractRequest;
 use App\Http\Requests\ReturnInspectionRequest;
 use App\Models\Booking;
+use App\Models\BookingContract;
 use App\Services\ContractService;
 use App\Services\ContractSettings;
 use App\Services\ContractTerms;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -32,15 +36,37 @@ class ContractController extends Controller
         $booking->load(['rental.car.make', 'rental.car.colors', 'rental.car.transmission', 'rental.car.fuel', 'customer', 'payment', 'contract']);
 
         $contract = $this->contracts->contractFor($booking);
+        $language = $this->contractLanguage($contract);
+
+        // The whole page (labels, dates, clauses) follows the contract's language.
+        app()->setLocale($language);
+        Carbon::setLocale($language);
 
         return view('contracts.delivery', $this->shared($booking) + [
             'contract' => $contract,
+            'language' => $language,
             'title' => $this->settings->title(),
             'footerNote' => $this->settings->footerNote(),
             'terms' => $contract->isSigned() && $contract->terms_snapshot
                 ? ContractTerms::clean($contract->terms_snapshot)
-                : $this->terms->render($booking, $contract->signer_document),
+                : $this->terms->render($booking, $contract->signer_document, $language),
         ]);
+    }
+
+    public function setDeliveryLanguage(Request $request, Booking $booking): RedirectResponse
+    {
+        $data = $request->validate(['language' => ['required', Rule::in(['es', 'en'])]]);
+
+        return $this->attempt(
+            fn () => $this->contracts->setDeliveryLanguage($booking, $data['language']),
+            route('contracts.delivery', $booking),
+            $data['language'] === 'en' ? 'Idioma del contrato: inglés.' : 'Idioma del contrato: español.',
+        );
+    }
+
+    protected function contractLanguage(BookingContract $contract): string
+    {
+        return in_array($contract->language, ['es', 'en'], true) ? $contract->language : 'es';
     }
 
     public function saveDelivery(DeliveryContractRequest $request, Booking $booking): RedirectResponse

@@ -10,7 +10,7 @@
 
 <div class="diagram" data-editable="{{ $editable ? 1 : 0 }}">
     @if ($editable)
-        <p class="diagram-help no-print">{{ $help ?? 'Selecciona el tipo de daño y haz clic en el lugar exacto del vehículo. Toca una marca para quitarla.' }}</p>
+        <p class="diagram-help no-print">{{ $help ?? __('Selecciona el tipo de daño y haz clic en el lugar exacto del vehículo. Toca una marca para quitarla.') }}</p>
     @endif
 
     <div class="damage-legend">
@@ -26,7 +26,7 @@
     </div>
 
     <svg class="vehicle-diagram" viewBox="0 0 {{ \App\Services\ContractService::DIAGRAM_WIDTH }} {{ \App\Services\ContractService::DIAGRAM_HEIGHT }}"
-         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{{ 'Diagrama de daños del vehículo' }}">
+         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{{ __('Diagrama de daños del vehículo') }}">
         <g class="car" fill="#fff" stroke="#374151" stroke-width="1.6" stroke-linejoin="round">
             {{-- Lado izquierdo (el vehículo mira a la derecha) --}}
             <g transform="translate(15,15)">
@@ -98,11 +98,11 @@
         </g>
 
         <g class="view-labels" fill="#6b7280" font-size="12" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">
-            <text x="178" y="160">{{ 'Lado izquierdo' }}</text>
-            <text x="522" y="160">{{ 'Lado derecho' }}</text>
-            <text x="95" y="345">{{ 'Frente' }}</text>
-            <text x="350" y="345">{{ 'Vista superior' }} &rarr;</text>
-            <text x="605" y="345">{{ 'Trasera' }}</text>
+            <text x="178" y="160">{{ __('Lado izquierdo') }}</text>
+            <text x="522" y="160">{{ __('Lado derecho') }}</text>
+            <text x="95" y="345">{{ __('Frente') }}</text>
+            <text x="350" y="345">{{ __('Vista superior') }} &rarr;</text>
+            <text x="605" y="345">{{ __('Trasera') }}</text>
         </g>
 
         @if (! empty($referenceMarks))
@@ -142,12 +142,12 @@
                     <td>{{ $mark['note'] }}</td>
                 </tr>
             @empty
-                <tr class="damage-empty"><td colspan="3">{{ 'Sin daños marcados.' }}</td></tr>
+                <tr class="damage-empty"><td colspan="3">{{ __('Sin daños marcados.') }}</td></tr>
             @endforelse
         </tbody>
     </table>
 
-    <p class="diagram-purpose">{{ $purpose ?? 'Las marcas indican los daños que el vehículo ya tenía al momento de la entrega. Cualquier daño no marcado aquí que aparezca a la devolución se considerará ocurrido durante la renta.' }}</p>
+    <p class="diagram-purpose">{{ $purpose ?? __('Las marcas indican los daños que el vehículo ya tenía al momento de la entrega. Cualquier daño no marcado aquí que aparezca a la devolución se considerará ocurrido durante la renta.') }}</p>
 
     @if ($editable)
         <input type="hidden" class="diagram-marks-input" name="{{ $inputName ?? 'damage_marks' }}" value="{{ json_encode($marks) }}">

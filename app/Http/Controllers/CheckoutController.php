@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\DocumentType;
 use App\Enums\PaymentMethod;
 use App\Models\Booking;
 use App\Models\Car;
+use App\Models\Customer;
 use App\Models\Setting;
 use App\Services\BookingCheckout;
+use App\Services\CustomerMatcher;
 use App\Services\RentalQuote;
 use App\Support\LocalTime;
 use Illuminate\Database\Eloquent\Builder;
@@ -53,6 +56,10 @@ class CheckoutController extends Controller
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:120'],
             'phone' => ['required', 'string', 'min:7', 'max:25'],
+            'document_type' => ['required', Rule::in(array_column(DocumentType::cases(), 'value'))],
+            'national_id' => ['required', 'string', 'min:5', 'max:30'],
+            'document_front' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'document_back' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'note' => ['nullable', 'string', 'max:1000'],
             'payment_method' => ['required', Rule::in(array_keys($methods))],
             'services' => ['nullable', 'array'],
@@ -71,6 +78,16 @@ class CheckoutController extends Controller
             $booking = $checkout->book($car, $from, $to, $data, PaymentMethod::from($data['payment_method']), $data['services'] ?? []);
         } catch (ValidationException $exception) {
             return back()->withInput()->withErrors($exception->errors());
+        }
+
+        // Identity data and photos go to the customer's profile, once the booking exists.
+        if ($customer = Customer::query()->find($booking->customer_id)) {
+            $customer->forceFill([
+                'national_id' => $customer->national_id ?: $data['national_id'],
+                'document_type' => $customer->document_type ?: $data['document_type'],
+            ])->save();
+
+            app(CustomerMatcher::class)->storeDocumentPhotos($customer, $request->file('document_front'), $request->file('document_back'));
         }
 
         return redirect(lroute('site.booking', $booking->transaction_id));
